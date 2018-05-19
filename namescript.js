@@ -5,6 +5,9 @@ Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
 
 const https = require('https');
 const request = require('request');
+const toml = require('toml');
+const concat = require('concat-stream');
+const fs = require('fs');
 const MWBot = require('mwbot');
 
 const bot = new MWBot({
@@ -3709,38 +3712,37 @@ const bot = new MWBot({
         }), "Adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
     }
 
-    function setItem(item, summary) {
-		bot.request({
+    async function setItem(item, summary) {
+		const data = await bot.request({
 			action: 'wbeditentity',
 			id: itemId,
 			data: item,
 			summary: summary,
             exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases',
 			token: bot.editToken
-		}).then((data) => {
-            if (data.success === 1) {
-				console.log('Sent: ' + summary);
-            } else {
-				console.error(data);
-            }
-        }).catch(function (data) {
+		}).catch(console.error);
+        if (data.success === 1) {
+			console.log('Sent: ' + summary);
+        } else {
 			console.error(data);
-        });
+        }
     }
 
-	bot.loginGetEditToken({
-		username: 'Lucas Werkmeister',
-		password: "NOT PUBLIC LMAO"
-	}).then(() => {
-		bot.request({
+	fs.createReadStream('config.toml', 'utf8').pipe(concat(async function(data) {
+		const response = await bot.request({
 			action: 'wbgetentities',
 			ids: itemId,
-		props: 'labels|descriptions|claims'
-		}).then((response) => {
-			entity = response['entities'][itemId];
-			claims = entity['claims'];
-			console.log('loaded');
-			inserteditlinks();
-		}).catch(console.error);
-	});
+			props: 'labels|descriptions|claims'
+		});
+		entity = response['entities'][itemId];
+		claims = entity['claims'];
+		console.log('loaded');
+		const parsed = toml.parse(data);
+		await bot.loginGetEditToken({
+			username: parsed['auth']['username'],
+			password: parsed['auth']['password']
+		});
+		console.log('logged in');
+		inserteditlinks();
+	}));
 } () );
