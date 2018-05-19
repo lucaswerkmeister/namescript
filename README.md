@@ -50,6 +50,48 @@ so depending on the current state of the sandbox items the above command may not
 (However, you can still use it to test if the configuration file is correct,
 since the script will attempt to login before looking at the items.)
 
+## Problems
+
+### “command not found”
+
+If you get “command not found” errors, make sure all of the following packages are installed:
+
+* git
+* npm
+* node
+* nano
+
+The process for this varies by Linux distribution; on Debian or Ubuntu, try this:
+
+```sh
+sudo apt install git npm nodejs nano
+```
+
+Also, the `node` command may be called `nodejs` or `node.js` on some distributions –
+if you still get errors after installing all packages,
+try running `nodejs namescript.js` or `node.js namescript.js`.
+
+### SyntaxError: unexpected token `{`
+
+If `node namescript.js` reports a syntax error, your Node.js version might be too outdated.
+If your distribution does not offer a more recent version,
+the easiest way to get a newer version of Node.js is to use Node Version Manager.
+Try the following commands:
+
+```
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+nvm install node
+nvm use node
+```
+
+This should install the newest version of Node.js and register it as the default version.
+If you get a “command not found” error for `nvm` at the second step,
+try closing the current terminal and opening a new one,
+and then run the two `nvm` commands.
+
+If those instructions don’t work,
+please refer to the [nvm README file](https://github.com/creationix/nvm#readme) for details.
+
 ## License
 
 CC-BY-SA (as it comes from a wiki page),
