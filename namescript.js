@@ -225,7 +225,7 @@ async function setItem(item, itemId, summary) {
 		summary: summary,
 		exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases',
 		token: bot.editToken
-	}).catch(console.error);
+	});
 	if (data.success === 1) {
 		console.log('Sent: ' + summary);
 	} else {
@@ -245,7 +245,7 @@ async function clearDescriptions(entity) {
 		data: JSON.stringify(payload),
 		summary: 'Delete all descriptions (part of namescript)',
 		token: bot.editToken
-	}).catch(console.error);
+	});
 }
 
 main();
