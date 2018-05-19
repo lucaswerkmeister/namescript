@@ -64,7 +64,7 @@ function die(error) {
 	var entity = null,
 		claims = null;
 
-	function inserteditlinks() {
+	async function inserteditlinks() {
 		if (claims["P31"]) {
 			const instanceOf = claims["P31"][0]["mainsnak"]["datavalue"]["value"]["id"];
 			if ((["Q12308941", "Q11879590", "Q101352", "Q29042997", "Q3409032"].indexOf(instanceOf)) > -1) {
@@ -75,21 +75,18 @@ function die(error) {
 						const script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
 						
 						if(supportedScripts.indexOf(script) !== -1) {
-							function add() {
-								if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
-									prepareStuff(name, "surname", script);
-								} else if (instanceOf == "Q12308941") {
-									prepareStuff(name, "male given name", script);
-								} else if (instanceOf == "Q11879590") {
-									prepareStuff(name, "female given name", script);
-								} else if (instanceOf == "Q3409032") {
-									prepareStuff(name, "unisex given name", script);
-								} else {
-									return false;
-								}
+							await clearDescriptions(entity);
+							if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
+								await prepareStuff(name, "surname", script);
+							} else if (instanceOf == "Q12308941") {
+								await prepareStuff(name, "male given name", script);
+							} else if (instanceOf == "Q11879590") {
+								await prepareStuff(name, "female given name", script);
+							} else if (instanceOf == "Q3409032") {
+								await prepareStuff(name, "unisex given name", script);
+							} else {
+								return false;
 							}
-
-							add();
 						} else {
 							console.error(translate('unknown-P282'));
 						}
@@ -123,7 +120,7 @@ function die(error) {
 		return pattern.replace('$desc', description).replace('$name', name);
 	}
 
-	function prepareStuff(name, desctype, script) {
+	async function prepareStuff(name, desctype, script) {
 		var countlabels = 0;
 		var countdescs = 0;
 		var countaliases = 0;
@@ -171,7 +168,7 @@ function die(error) {
 			}
 		}
 
-		setItem(JSON.stringify({
+		await setItem(JSON.stringify({
 			'descriptions': jsonDesc,
 			'labels': jsonLabel,
 			'aliases': jsonAliases
@@ -192,6 +189,21 @@ function die(error) {
 		} else {
 			console.error(data);
 		}
+	}
+
+	async function clearDescriptions(entity) {
+		const payload = { descriptions: [] };
+		for (const language in entity.descriptions) {
+			payload.descriptions.push({ language: language, remove: '' });
+		}
+		entity.descriptions = {};
+		return await bot.request({
+			action: 'wbeditentity',
+			id: entity.id,
+			data: JSON.stringify(payload),
+			summary: 'Delete all descriptions',
+			token: bot.editToken
+		}).catch(console.error);
 	}
 
 	fs.createReadStream('config.toml', 'utf8').pipe(concat(async function(data) {
