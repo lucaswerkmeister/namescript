@@ -38,6 +38,25 @@ const {
 	nonScriptLangList
 } = JSON.parse(fs.readFileSync('namescript-data.json', 'utf8'));
 
+let namescriptConfig = {
+	// function to send an API request with the specified parameters
+	apiRequest: function(params) {
+		throw new Error('not implemented');
+	},
+	// whether to clear descriptions or not before adding new ones
+	clearDescriptions: false,
+	// function to prepare adding the labels/etc., possibly waiting for user input before calling the add() callback
+	prepareAdd: function(add) {
+		throw new Error('not implemented');
+	},
+	// function to show an active informational message to the user
+	infoActive: function(message) {},
+	// function to show an active error message to the user
+	errorActive: function(message) {},
+	// function to attach an error message to the P31 statement
+	errorP31: function(message) {}
+};
+
 async function main() {
 	let configStr;
 	try {
@@ -57,6 +76,26 @@ async function main() {
 		username: config['auth']['username'],
 		password: config['auth']['password']
 	}).catch(die);
+
+	namescriptConfig = {
+		apiRequest: function(params) {
+			params.token = bot.editToken;
+			return bot.request(params);
+		},
+		clearDescriptions: true,
+		prepareAdd: function(add) {
+			add();
+		},
+		infoActive: function(message) {
+			console.log(message);
+		},
+		errorActive: function(message) {
+			console.error(message);
+		},
+		errorP31: function(message) {
+			console.error(message);
+		}
+	};
 
 	const deletedIds = [];
 	const failedIds = [];
@@ -127,26 +166,31 @@ async function inserteditlinks(entity) {
 					const script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
 					
 					if(supportedScripts.indexOf(script) !== -1) {
-						await clearDescriptions(entity);
-						if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
-							await prepareStuff(entity, name, "surname", script);
-						} else if (instanceOf == "Q12308941") {
-							await prepareStuff(entity, name, "male given name", script);
-						} else if (instanceOf == "Q11879590") {
-							await prepareStuff(entity, name, "female given name", script);
-						} else if (instanceOf == "Q3409032") {
-							await prepareStuff(entity, name, "unisex given name", script);
-						} else {
-							return false;
+						async function add() {
+							if (namescriptConfig.clearDescriptions) {
+								await clearDescriptions(entity);
+							}
+							if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
+								await prepareStuff(entity, name, "surname", script);
+							} else if (instanceOf == "Q12308941") {
+								await prepareStuff(entity, name, "male given name", script);
+							} else if (instanceOf == "Q11879590") {
+								await prepareStuff(entity, name, "female given name", script);
+							} else if (instanceOf == "Q3409032") {
+								await prepareStuff(entity, name, "unisex given name", script);
+							} else {
+								return false;
+							}
 						}
+						namescriptConfig.prepareAdd(add);
 					} else {
-						console.error(translate('unknown-P282'));
+						namescriptConfig.errorP31(translate('unknown-P282'));
 					}
 				} else {
-					console.error(translate('no-P282'));
+					namescriptConfig.errorP31(translate('no-P282'));
 				}
 			} else {
-				console.error(translate('no-P1705'));
+				namescriptConfig.errorP31(translate('no-P1705'));
 			}
 		} else {
 			return false;
@@ -191,7 +235,7 @@ async function prepareStuff(entity, name, desctype, script) {
 	}
 	
 	if (newlanglist.length === 0) {
-		console.log(translate('all-set'));
+		namescriptConfig.infoActive(translate('all-set'));
 	} else {
 		for (var j = 0; j < newlanglist.length; j++) {
 			countlabels++;
@@ -228,18 +272,17 @@ async function prepareStuff(entity, name, desctype, script) {
 }
 
 async function setItem(item, itemId, summary) {
-	const data = await bot.request({
+	const data = await namescriptConfig.apiRequest({
 		action: 'wbeditentity',
 		id: itemId,
 		data: item,
 		summary: summary,
-		exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases',
-		token: bot.editToken
+		exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases'
 	});
 	if (data.success === 1) {
-		console.log('Sent: ' + summary);
+		namescriptConfig.infoActive('Sent: ' + summary);
 	} else {
-		console.error(data);
+		namescriptConfig.errorActive(data);
 	}
 }
 
@@ -249,12 +292,11 @@ async function clearDescriptions(entity) {
 		payload.descriptions.push({ language: language, remove: '' });
 	}
 	entity.descriptions = {};
-	return await bot.request({
+	return await namescriptConfig.apiRequest({
 		action: 'wbeditentity',
 		id: entity.id,
 		data: JSON.stringify(payload),
-		summary: 'Delete all descriptions (part of namescript)',
-		token: bot.editToken
+		summary: 'Delete all descriptions (part of namescript)'
 	});
 }
 
