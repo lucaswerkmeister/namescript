@@ -38,6 +38,36 @@ const {
 	nonScriptLangList
 } = JSON.parse(fs.readFileSync('namescript-data.json', 'utf8'));
 
+async function main() {
+	let configStr;
+	try {
+		configStr = fs.readFileSync('config.toml', 'utf8');
+	} catch (e) {
+		die('config.toml file could not be read\n' +
+			'Please copy config.toml.example to config.toml and enter your own username and password');
+	}
+	const config = toml.parse(configStr);
+	if ('ui' in config && 'language' in config['ui']) {
+		const confLang = config['ui']['language'];
+		if (i18n.hasOwnProperty(confLang)) {
+			lang = confLang;
+		}
+	}
+	await bot.loginGetEditToken({
+		username: config['auth']['username'],
+		password: config['auth']['password']
+	}).catch(die);
+	for (const itemId of process.argv.slice(2)) {
+		console.log(itemId);
+		const response = await bot.request({
+			action: 'wbgetentities',
+			ids: itemId,
+			props: 'labels|descriptions|claims'
+		}).catch(die);
+		await inserteditlinks(response['entities'][itemId]);
+	}
+}
+
 function die(error) {
 	console.error(error);
 	process.exit(1);
@@ -195,25 +225,4 @@ async function clearDescriptions(entity) {
 	}).catch(console.error);
 }
 
-fs.createReadStream('config.toml', 'utf8').pipe(concat(async function(data) {
-	const parsed = toml.parse(data);
-	if ('ui' in parsed && 'language' in parsed['ui']) {
-		const confLang = parsed['ui']['language'];
-		if (i18n.hasOwnProperty(confLang)) {
-			lang = confLang;
-		}
-	}
-	await bot.loginGetEditToken({
-		username: parsed['auth']['username'],
-		password: parsed['auth']['password']
-	}).catch(die);
-	for (const itemId of process.argv.slice(2)) {
-		console.log(itemId);
-		const response = await bot.request({
-			action: 'wbgetentities',
-			ids: itemId,
-			props: 'labels|descriptions|claims'
-		}).catch(die);
-		await inserteditlinks(response['entities'][itemId])
-	};
-}));
+main();
