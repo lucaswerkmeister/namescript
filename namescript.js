@@ -37,6 +37,11 @@ const {
 	nonScriptLangList
 } = JSON.parse(fs.readFileSync('namescript-data.json', 'utf8'));
 
+function die(error) {
+	console.error(error);
+	process.exit(1);
+}
+
 ( function () {
 	/* Return item number */
 	const itemId = process.argv[2];
@@ -194,14 +199,14 @@ const {
 			action: 'wbgetentities',
 			ids: itemId,
 			props: 'labels|descriptions|claims'
-		});
+		}).catch(die);
 		entity = response['entities'][itemId];
 		claims = entity['claims'];
 		const parsed = toml.parse(data);
 		await bot.loginGetEditToken({
 			username: parsed['auth']['username'],
 			password: parsed['auth']['password']
-		});
+		}).catch(die);
 		inserteditlinks();
 	}));
 } () );
