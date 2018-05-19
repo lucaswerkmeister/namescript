@@ -3,9 +3,17 @@ Adapted from [[User:Jon Harald Søby/namescript.js]] with help from Dereckson - 
 Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
 */
 
-( function ( mw, $ ) {
+const https = require('https');
+const request = require('request');
+const MWBot = require('mwbot');
+
+const bot = new MWBot({
+	apiUrl: 'https://www.wikidata.org/w/api.php'
+});
+
+( function () {
     /* Return item number */
-    var itemId = mw.config.get('wbEntityId');
+    var itemId = process.argv[2];
     if (!itemId) {
         return;
     }
@@ -71,10 +79,7 @@ Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
     };
 
     /* Check if main language can be translated */
-    var lang = mw.config.get('wgUserLanguage');
-    if (!i18n.hasOwnProperty(lang)) {
-        lang = 'en';
-    }
+    var lang = 'en';
 
     /* Return localized message */
     function translate(key) {
@@ -3585,19 +3590,20 @@ Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
 		"QQQ": []
     };
 
-    var claims = JSON.parse(mw.config.get('wbEntity'))["claims"];
+	var entity = null,
+		claims = null;
 
     function inserteditlinks() {
         if (claims["P31"]) {
             var instanceOf = claims["P31"][0]["mainsnak"]["datavalue"]["value"]["id"];
-            if (($.inArray(instanceOf, ["Q12308941", "Q11879590", "Q101352", "Q29042997", "Q3409032"])) > -1) {
+            if ((["Q12308941", "Q11879590", "Q101352", "Q29042997", "Q3409032"].indexOf(instanceOf)) > -1) {
                 if (claims["P1705"]) {
                     var name = claims["P1705"][0]["mainsnak"]["datavalue"]["value"]["text"];
 
 					if (claims["P282"]) {
 						var script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
 						
-						if($.inArray(script, supportedScripts) !== -1) {
+						if(supportedScripts.indexOf(script) !== -1) {
 		                    function add() {
 		                        if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
 		                            prepareStuff(name, "surname", script);
@@ -3611,47 +3617,26 @@ Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
 		                            return false;
 		                        }
 		                    }
-		
-		                    $('#P31 .wikibase-snakview-variation-valuesnak a').after($('<div  />', {
-		                        css: {
-		                            "font-weight": "bold",
-		                            "cursor": "pointer"
-		                        },
-		                        text: translate('add-button'),
-		                        click: add
-		                    }));
+
+							add();
 						} else {
-							$('#P31 .wikibase-snakview-variation-valuesnak a').after($('<div />', {
-		                        text: translate('unknown-P282'),
-		                        css: {
-		                            "color": "#f00"
-		                        }
-							}));
+							console.error(translate('unknown-P282'));
 						}
 					} else {
-						$('#P31 .wikibase-snakview-variation-valuesnak a').after($('<div />', {
-	                        text: translate('no-P282'),
-	                        css: {
-	                            "color": "#f00"
-	                        }
-	                    }));
+						console.error(translate('no-P282'));
 					}
                 } else {
-                    $('#P31 .wikibase-snakview-variation-valuesnak a').after($('<div />', {
-                        text: translate('no-P1705'),
-                        css: {
-                            "color": "#f00"
-                        }
-                    }));
+                    console.error(translate('no-P1705'));
                 }
             } else {
+				console.log('not a name');
                 return false;
             }
         }
     }
 
     function isLatinLanguageCode(lang, script) {
-        return $.inArray(lang, nonScriptLangList[script]) === -1;
+        return nonScriptLangList[script].indexOf(lang) === -1;
     }
 
     function getDescription(lang, name, desctype, script) {
@@ -3669,16 +3654,17 @@ Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
     }
 
     function prepareStuff(name, desctype, script) {
+		console.log('preparing stuff');
         var countlabels = 0;
         var countdescs = 0;
         var countaliases = 0;
         var jsonLabel = [];
         var jsonDesc = [];
         var jsonAliases = [];
-        var existingdescs = JSON.parse(mw.config.get('wbEntity'))["descriptions"];
+        var existingdescs = entity["descriptions"];
         var newdesclist = {};
         
-        var existinglabels = JSON.parse(mw.config.get('wbEntity'))["labels"];
+        var existinglabels = entity["labels"];
 	    var newlanglist = [];
 	    for (var i = 0; i < langlist[script].length; i++) {
 	        if (!existinglabels[langlist[script][i]]) {
@@ -3727,37 +3713,37 @@ Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
     }
 
     function setItem(item, summary) {
-        $.ajax({
-            type: 'POST',
-            url: mw.util.wikiScript('api'),
-            data: {
-                'format': 'json',
-                'action': 'wbeditentity',
-                'id': itemId,
-                'token': mw.user.tokens.get('editToken'),
-                'data': item,
-                'summary': summary,
-                'exclude': 'pageid|ns|title|lastrevid|touched|sitelinks|aliases'
-            }
-        }).done(function (data) {
+		bot.request({
+			action: 'wbeditentity',
+			id: itemId,
+			data: item,
+			summary: summary,
+            exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases',
+			token: bot.editToken
+		}).then((data) => {
             if (data.success === 1) {
-                mw.notify('Sent: ' + summary, {
-                    title: translate('title'),
-                    tag: 'Name script'
-                });
+				console.log('Sent: ' + summary);
             } else {
-                mw.notify('Error: ' + JSON.stringify(data), {
-                    title: translate('title'),
-                    tag: 'Name script'
-                });
+				console.error(data);
             }
-        }).fail(function (data) {
-            mw.notify('Error: ' + JSON.stringify(data), {
-                title: translate('title'),
-                tag: 'Name script'
-            });
+        }).catch(function (data) {
+			console.error(data);
         });
     }
 
-    $(document).ready(inserteditlinks);
-} (mediaWiki, jQuery) );
+	bot.loginGetEditToken({
+		username: 'Lucas Werkmeister',
+		password: "NOT PUBLIC LMAO"
+	}).then(() => {
+		bot.request({
+			action: 'wbgetentities',
+			ids: itemId,
+		props: 'labels|descriptions|claims'
+		}).then((response) => {
+			entity = response['entities'][itemId];
+			claims = entity['claims'];
+			console.log('loaded');
+			inserteditlinks();
+		}).catch(console.error);
+	});
+} () );
