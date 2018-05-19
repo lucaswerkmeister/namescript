@@ -57,6 +57,9 @@ async function main() {
 		username: config['auth']['username'],
 		password: config['auth']['password']
 	}).catch(die);
+
+	const deletedIds = [];
+	const failedIds = [];
 	for (const itemId of process.argv.slice(2)) {
 		console.log(itemId);
 		const response = await bot.request({
@@ -64,7 +67,27 @@ async function main() {
 			ids: itemId,
 			props: 'labels|descriptions|claims'
 		}).catch(die);
-		await inserteditlinks(response['entities'][itemId]);
+		const entity = response &&
+			  response['entities'] &&
+			  response['entities'][itemId];
+		if (!entity || !entity['claims']) {
+			console.error('No data for ' + itemId + '!');
+			deletedIds.push(itemId);
+			continue;
+		}
+		try {
+			await inserteditlinks(response['entities'][itemId]);
+		} catch (e) {
+			console.error('Error while editing ' + itemId + '!');
+			console.error(e);
+			failedIds.push(itemId);
+		}
+	}
+	if (deletedIds.length) {
+		console.log('There was no data for the following item IDs: ' + deletedIds.join(', '));
+	}
+	if (failedIds.length) {
+		console.log('There was an error for the following item IDs: ' + failedIds.join(', '));
 	}
 }
 
