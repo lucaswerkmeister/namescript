@@ -1,0 +1,26 @@
+{
+  "name": "namescript",
+  "version": "1.0.0",
+  "description": "Automatically set labels, descriptions and aliases of name items, replacing all existing descriptions.",
+  "main": "namescript.js",
+  "dependencies": {
+    "concat-stream": "^1.6.2",
+    "mwbot": "^1.0.10",
+    "request": "^2.86.0",
+    "toml": "^2.3.3"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucaswerkmeister/namescript.git"
+  },
+  "keywords": [
+    "wikidata"
+  ],
+  "author": "Jon Harald Søby, Dereckson, Jitrixis, Tpt, Harmonia Amanda, Lucas Werkmeister, et al.",
+  "license": "CC-BY-SA-3.0",
+  "bugs": {
+    "url": "https://github.com/lucaswerkmeister/namescript/issues"
+  },
+  "homepage": "https://github.com/lucaswerkmeister/namescript#readme"
+}
