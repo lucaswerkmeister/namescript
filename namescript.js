@@ -39,13 +39,13 @@ const {
 
 ( function () {
 	/* Return item number */
-	var itemId = process.argv[2];
+	const itemId = process.argv[2];
 	if (!itemId) {
 		return;
 	}
 
 	/* Check if main language can be translated */
-	var lang = 'en';
+	const lang = 'en';
 
 	/* Return localized message */
 	function translate(key) {
@@ -61,13 +61,13 @@ const {
 
 	function inserteditlinks() {
 		if (claims["P31"]) {
-			var instanceOf = claims["P31"][0]["mainsnak"]["datavalue"]["value"]["id"];
+			const instanceOf = claims["P31"][0]["mainsnak"]["datavalue"]["value"]["id"];
 			if ((["Q12308941", "Q11879590", "Q101352", "Q29042997", "Q3409032"].indexOf(instanceOf)) > -1) {
 				if (claims["P1705"]) {
-					var name = claims["P1705"][0]["mainsnak"]["datavalue"]["value"]["text"];
+					const name = claims["P1705"][0]["mainsnak"]["datavalue"]["value"]["text"];
 
 					if (claims["P282"]) {
-						var script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
+						const script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
 						
 						if(supportedScripts.indexOf(script) !== -1) {
 							function add() {
@@ -105,7 +105,7 @@ const {
 	}
 
 	function getDescription(lang, name, desctype, script) {
-		var description = descriptions[desctype][script][lang];
+		const description = descriptions[desctype][script][lang];
 
 		if (isLatinLanguageCode(lang, script)) {
 			return description;
@@ -156,7 +156,7 @@ const {
 				}] );
 		}
 
-		for (var lang in descriptions[desctype][script]) {
+		for (const lang in descriptions[desctype][script]) {
 			if (!existingdescs[lang]) {
 				countdescs++;
 				jsonDesc.push({
