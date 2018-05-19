@@ -190,7 +190,7 @@ async function clearDescriptions(entity) {
 		action: 'wbeditentity',
 		id: entity.id,
 		data: JSON.stringify(payload),
-		summary: 'Delete all descriptions',
+		summary: 'Delete all descriptions (part of namescript)',
 		token: bot.editToken
 	}).catch(console.error);
 }
