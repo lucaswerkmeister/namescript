@@ -3632,7 +3632,6 @@ const bot = new MWBot({
                     console.error(translate('no-P1705'));
                 }
             } else {
-				console.log('not a name');
                 return false;
             }
         }
@@ -3657,7 +3656,6 @@ const bot = new MWBot({
     }
 
     function prepareStuff(name, desctype, script) {
-		console.log('preparing stuff');
         var countlabels = 0;
         var countdescs = 0;
         var countaliases = 0;
@@ -3736,13 +3734,11 @@ const bot = new MWBot({
 		});
 		entity = response['entities'][itemId];
 		claims = entity['claims'];
-		console.log('loaded');
 		const parsed = toml.parse(data);
 		await bot.loginGetEditToken({
 			username: parsed['auth']['username'],
 			password: parsed['auth']['password']
 		});
-		console.log('logged in');
 		inserteditlinks();
 	}));
 } () );
