@@ -61,10 +61,8 @@ function die(error) {
 		}
 	}
 
-	var entity = null,
-		claims = null;
-
-	async function inserteditlinks() {
+	async function inserteditlinks(entity) {
+		const claims = entity['claims'];
 		if (claims["P31"]) {
 			const instanceOf = claims["P31"][0]["mainsnak"]["datavalue"]["value"]["id"];
 			if ((["Q12308941", "Q11879590", "Q101352", "Q29042997", "Q3409032"].indexOf(instanceOf)) > -1) {
@@ -77,13 +75,13 @@ function die(error) {
 						if(supportedScripts.indexOf(script) !== -1) {
 							await clearDescriptions(entity);
 							if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
-								await prepareStuff(name, "surname", script);
+								await prepareStuff(entity, name, "surname", script);
 							} else if (instanceOf == "Q12308941") {
-								await prepareStuff(name, "male given name", script);
+								await prepareStuff(entity, name, "male given name", script);
 							} else if (instanceOf == "Q11879590") {
-								await prepareStuff(name, "female given name", script);
+								await prepareStuff(entity, name, "female given name", script);
 							} else if (instanceOf == "Q3409032") {
-								await prepareStuff(name, "unisex given name", script);
+								await prepareStuff(entity, name, "unisex given name", script);
 							} else {
 								return false;
 							}
@@ -120,7 +118,7 @@ function die(error) {
 		return pattern.replace('$desc', description).replace('$name', name);
 	}
 
-	async function prepareStuff(name, desctype, script) {
+	async function prepareStuff(entity, name, desctype, script) {
 		var countlabels = 0;
 		var countdescs = 0;
 		var countaliases = 0;
@@ -172,10 +170,10 @@ function die(error) {
 			'descriptions': jsonDesc,
 			'labels': jsonLabel,
 			'aliases': jsonAliases
-		}), "Adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
+		}), entity.id, "Adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
 	}
 
-	async function setItem(item, summary) {
+	async function setItem(item, itemId, summary) {
 		const data = await bot.request({
 			action: 'wbeditentity',
 			id: itemId,
@@ -212,13 +210,11 @@ function die(error) {
 			ids: itemId,
 			props: 'labels|descriptions|claims'
 		}).catch(die);
-		entity = response['entities'][itemId];
-		claims = entity['claims'];
 		const parsed = toml.parse(data);
 		await bot.loginGetEditToken({
 			username: parsed['auth']['username'],
 			password: parsed['auth']['password']
 		}).catch(die);
-		inserteditlinks();
+		inserteditlinks(response['entities'][itemId]);
 	}));
 } () );
