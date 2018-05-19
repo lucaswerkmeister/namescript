@@ -13,6 +13,7 @@ const MWBot = require('mwbot');
 const bot = new MWBot({
 	apiUrl: 'https://www.wikidata.org/w/api.php'
 });
+var lang = 'en';
 
 const {
 	// localized messages
@@ -42,23 +43,20 @@ function die(error) {
 	process.exit(1);
 }
 
+/* Return localized message */
+function translate(key) {
+	if (i18n[lang].hasOwnProperty(key)) {
+		return i18n[lang][key];
+	} else {
+		return i18n['en'][key];
+	}
+}
+
 ( function () {
 	/* Return item number */
 	const itemId = process.argv[2];
 	if (!itemId) {
 		return;
-	}
-
-	/* Check if main language can be translated */
-	const lang = 'en';
-
-	/* Return localized message */
-	function translate(key) {
-		if (i18n[lang].hasOwnProperty(key)) {
-			return i18n[lang][key];
-		} else {
-			return i18n['en'][key];
-		}
 	}
 
 	async function inserteditlinks(entity) {
@@ -211,6 +209,12 @@ function die(error) {
 			props: 'labels|descriptions|claims'
 		}).catch(die);
 		const parsed = toml.parse(data);
+		if ('ui' in parsed && 'language' in parsed['ui']) {
+			const confLang = parsed['ui']['language'];
+			if (i18n.hasOwnProperty(confLang)) {
+				lang = confLang;
+			}
+		}
 		await bot.loginGetEditToken({
 			username: parsed['auth']['username'],
 			password: parsed['auth']['password']
