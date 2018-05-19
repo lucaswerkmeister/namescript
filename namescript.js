@@ -3,10 +3,7 @@
   Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
 */
 
-const https = require('https');
-const request = require('request');
 const toml = require('toml');
-const concat = require('concat-stream');
 const fs = require('fs');
 const MWBot = require('mwbot');
 
