@@ -52,173 +52,168 @@ function translate(key) {
 	}
 }
 
-( function () {
-	/* Return item number */
-	const itemId = process.argv[2];
-	if (!itemId) {
-		return;
-	}
+async function inserteditlinks(entity) {
+	const claims = entity['claims'];
+	if (claims["P31"]) {
+		const instanceOf = claims["P31"][0]["mainsnak"]["datavalue"]["value"]["id"];
+		if ((["Q12308941", "Q11879590", "Q101352", "Q29042997", "Q3409032"].indexOf(instanceOf)) > -1) {
+			if (claims["P1705"]) {
+				const name = claims["P1705"][0]["mainsnak"]["datavalue"]["value"]["text"];
 
-	async function inserteditlinks(entity) {
-		const claims = entity['claims'];
-		if (claims["P31"]) {
-			const instanceOf = claims["P31"][0]["mainsnak"]["datavalue"]["value"]["id"];
-			if ((["Q12308941", "Q11879590", "Q101352", "Q29042997", "Q3409032"].indexOf(instanceOf)) > -1) {
-				if (claims["P1705"]) {
-					const name = claims["P1705"][0]["mainsnak"]["datavalue"]["value"]["text"];
-
-					if (claims["P282"]) {
-						const script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
-						
-						if(supportedScripts.indexOf(script) !== -1) {
-							await clearDescriptions(entity);
-							if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
-								await prepareStuff(entity, name, "surname", script);
-							} else if (instanceOf == "Q12308941") {
-								await prepareStuff(entity, name, "male given name", script);
-							} else if (instanceOf == "Q11879590") {
-								await prepareStuff(entity, name, "female given name", script);
-							} else if (instanceOf == "Q3409032") {
-								await prepareStuff(entity, name, "unisex given name", script);
-							} else {
-								return false;
-							}
+				if (claims["P282"]) {
+					const script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
+					
+					if(supportedScripts.indexOf(script) !== -1) {
+						await clearDescriptions(entity);
+						if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
+							await prepareStuff(entity, name, "surname", script);
+						} else if (instanceOf == "Q12308941") {
+							await prepareStuff(entity, name, "male given name", script);
+						} else if (instanceOf == "Q11879590") {
+							await prepareStuff(entity, name, "female given name", script);
+						} else if (instanceOf == "Q3409032") {
+							await prepareStuff(entity, name, "unisex given name", script);
 						} else {
-							console.error(translate('unknown-P282'));
+							return false;
 						}
 					} else {
-						console.error(translate('no-P282'));
+						console.error(translate('unknown-P282'));
 					}
 				} else {
-					console.error(translate('no-P1705'));
+					console.error(translate('no-P282'));
 				}
 			} else {
-				return false;
+				console.error(translate('no-P1705'));
 			}
+		} else {
+			return false;
 		}
 	}
+}
 
-	function isLatinLanguageCode(lang, script) {
-		return nonScriptLangList[script].indexOf(lang) === -1;
+function isLatinLanguageCode(lang, script) {
+	return nonScriptLangList[script].indexOf(lang) === -1;
+}
+
+function getDescription(lang, name, desctype, script) {
+	const description = descriptions[desctype][script][lang];
+
+	if (isLatinLanguageCode(lang, script)) {
+		return description;
 	}
 
-	function getDescription(lang, name, desctype, script) {
-		const description = descriptions[desctype][script][lang];
-
-		if (isLatinLanguageCode(lang, script)) {
-			return description;
-		}
-
-		var pattern = '$desc ($name)';
-		if (lang in descriptionWithName) {
-			pattern = descriptionWithName[lang];
-		}
-		return pattern.replace('$desc', description).replace('$name', name);
+	var pattern = '$desc ($name)';
+	if (lang in descriptionWithName) {
+		pattern = descriptionWithName[lang];
 	}
+	return pattern.replace('$desc', description).replace('$name', name);
+}
 
-	async function prepareStuff(entity, name, desctype, script) {
-		var countlabels = 0;
-		var countdescs = 0;
-		var countaliases = 0;
-		var jsonLabel = [];
-		var jsonDesc = [];
-		var jsonAliases = [];
-		var existingdescs = entity["descriptions"];
-		var newdesclist = {};
-		
-		var existinglabels = entity["labels"];
-		var newlanglist = [];
-		for (var i = 0; i < langlist[script].length; i++) {
-			if (!existinglabels[langlist[script][i]]) {
-				newlanglist.push(langlist[script][i]);
-			}
-		}
+async function prepareStuff(entity, name, desctype, script) {
+	var countlabels = 0;
+	var countdescs = 0;
+	var countaliases = 0;
+	var jsonLabel = [];
+	var jsonDesc = [];
+	var jsonAliases = [];
+	var existingdescs = entity["descriptions"];
+	var newdesclist = {};
 	
-		if (newlanglist.length === 0) {
-			console.log(translate('all-set'));
-		} else {
-			for (var j = 0; j < newlanglist.length; j++) {
-				countlabels++;
-				jsonLabel.push({
-					language: newlanglist[j],
-					value: name
-				});
-			}
+	var existinglabels = entity["labels"];
+	var newlanglist = [];
+	for (var i = 0; i < langlist[script].length; i++) {
+		if (!existinglabels[langlist[script][i]]) {
+			newlanglist.push(langlist[script][i]);
 		}
-		for (var j = 0; j < aliaslanglist[script].length; j++) {
-				countaliases++;
-				jsonAliases.push( [{
-					language: aliaslanglist[script][j],
-					value: name,
-					add: ""
-				}] );
+	}
+	
+	if (newlanglist.length === 0) {
+		console.log(translate('all-set'));
+	} else {
+		for (var j = 0; j < newlanglist.length; j++) {
+			countlabels++;
+			jsonLabel.push({
+				language: newlanglist[j],
+				value: name
+			});
 		}
-
-		for (const lang in descriptions[desctype][script]) {
-			if (!existingdescs[lang]) {
-				countdescs++;
-				jsonDesc.push({
-					language: lang,
-					value: getDescription(lang, name, desctype, script)
-				});
-			}
-		}
-
-		await setItem(JSON.stringify({
-			'descriptions': jsonDesc,
-			'labels': jsonLabel,
-			'aliases': jsonAliases
-		}), entity.id, "Adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
+	}
+	for (var j = 0; j < aliaslanglist[script].length; j++) {
+		countaliases++;
+		jsonAliases.push( [{
+			language: aliaslanglist[script][j],
+			value: name,
+			add: ""
+		}] );
 	}
 
-	async function setItem(item, itemId, summary) {
-		const data = await bot.request({
-			action: 'wbeditentity',
-			id: itemId,
-			data: item,
-			summary: summary,
-			exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases',
-			token: bot.editToken
-		}).catch(console.error);
-		if (data.success === 1) {
-			console.log('Sent: ' + summary);
-		} else {
-			console.error(data);
+	for (const lang in descriptions[desctype][script]) {
+		if (!existingdescs[lang]) {
+			countdescs++;
+			jsonDesc.push({
+				language: lang,
+				value: getDescription(lang, name, desctype, script)
+			});
 		}
 	}
 
-	async function clearDescriptions(entity) {
-		const payload = { descriptions: [] };
-		for (const language in entity.descriptions) {
-			payload.descriptions.push({ language: language, remove: '' });
-		}
-		entity.descriptions = {};
-		return await bot.request({
-			action: 'wbeditentity',
-			id: entity.id,
-			data: JSON.stringify(payload),
-			summary: 'Delete all descriptions',
-			token: bot.editToken
-		}).catch(console.error);
-	}
+	await setItem(JSON.stringify({
+		'descriptions': jsonDesc,
+		'labels': jsonLabel,
+		'aliases': jsonAliases
+	}), entity.id, "Adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
+}
 
-	fs.createReadStream('config.toml', 'utf8').pipe(concat(async function(data) {
+async function setItem(item, itemId, summary) {
+	const data = await bot.request({
+		action: 'wbeditentity',
+		id: itemId,
+		data: item,
+		summary: summary,
+		exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases',
+		token: bot.editToken
+	}).catch(console.error);
+	if (data.success === 1) {
+		console.log('Sent: ' + summary);
+	} else {
+		console.error(data);
+	}
+}
+
+async function clearDescriptions(entity) {
+	const payload = { descriptions: [] };
+	for (const language in entity.descriptions) {
+		payload.descriptions.push({ language: language, remove: '' });
+	}
+	entity.descriptions = {};
+	return await bot.request({
+		action: 'wbeditentity',
+		id: entity.id,
+		data: JSON.stringify(payload),
+		summary: 'Delete all descriptions',
+		token: bot.editToken
+	}).catch(console.error);
+}
+
+fs.createReadStream('config.toml', 'utf8').pipe(concat(async function(data) {
+	const parsed = toml.parse(data);
+	if ('ui' in parsed && 'language' in parsed['ui']) {
+		const confLang = parsed['ui']['language'];
+		if (i18n.hasOwnProperty(confLang)) {
+			lang = confLang;
+		}
+	}
+	await bot.loginGetEditToken({
+		username: parsed['auth']['username'],
+		password: parsed['auth']['password']
+	}).catch(die);
+	for (const itemId of process.argv.slice(2)) {
+		console.log(itemId);
 		const response = await bot.request({
 			action: 'wbgetentities',
 			ids: itemId,
 			props: 'labels|descriptions|claims'
 		}).catch(die);
-		const parsed = toml.parse(data);
-		if ('ui' in parsed && 'language' in parsed['ui']) {
-			const confLang = parsed['ui']['language'];
-			if (i18n.hasOwnProperty(confLang)) {
-				lang = confLang;
-			}
-		}
-		await bot.loginGetEditToken({
-			username: parsed['auth']['username'],
-			password: parsed['auth']['password']
-		}).catch(die);
-		inserteditlinks(response['entities'][itemId]);
-	}));
-} () );
+		await inserteditlinks(response['entities'][itemId])
+	};
+}));
