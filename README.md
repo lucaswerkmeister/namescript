@@ -50,7 +50,7 @@ so depending on the current state of the sandbox items the above command may not
 (However, you can still use it to test if the configuration file is correct,
 since the script will attempt to login before looking at the items.)
 
-## Problems
+## Possible problems
 
 ### “command not found”
 
