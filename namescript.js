@@ -60,6 +60,7 @@ async function main() {
 
 	const deletedIds = [];
 	const failedIds = [];
+	const errorInfos = [];
 	for (const itemId of process.argv.slice(2)) {
 		console.log(itemId);
 		const response = await bot.request({
@@ -81,6 +82,9 @@ async function main() {
 			console.error('Error while editing ' + itemId + '!');
 			console.error(e);
 			failedIds.push(itemId);
+			if (e.info) {
+				errorInfos.push(e.info);
+			}
 		}
 	}
 	if (deletedIds.length) {
@@ -88,6 +92,12 @@ async function main() {
 	}
 	if (failedIds.length) {
 		console.log('There was an error for the following item IDs: ' + failedIds.join(', '));
+		if (errorInfos.length) {
+			console.log('Specifically, the API returned the following error messages:');
+			for (const errorInfo of errorInfos) {
+				console.log(errorInfo);
+			}
+		}
 	}
 }
 
