@@ -47,7 +47,7 @@ node namescript.js Q4115189 Q13406268
 
 Note that the script will silently skip any items that are not name items (and looks only at the *first* “instance of” statement),
 so depending on the current state of the sandbox items the above command may not do anything.
-(However, you can still use that to test if the configuration file is correct,
+(However, you can still use it to test if the configuration file is correct,
 since the script will attempt to login before looking at the items.)
 
 ## License
