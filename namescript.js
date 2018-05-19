@@ -3673,10 +3673,7 @@ const bot = new MWBot({
 	    }
     
         if (newlanglist.length === 0) {
-            mw.notify(translate('all-set'), {
-                title: translate('title'),
-                tag: 'Name script'
-            });
+			console.log(translate('all-set'));
         } else {
             for (var j = 0; j < newlanglist.length; j++) {
                 countlabels++;
