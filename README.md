@@ -36,6 +36,14 @@ Optionally, you can choose a different language than English as well.
 nano config.toml
 ```
 
+This setup only needs to be run once;
+afterwards, to update to a newer version of the software,
+run the following command (inside the `namescript` directory):
+
+```sh
+git pull
+```
+
 ## Usage
 
 Once the script is set up, you can run it on any number of items.
