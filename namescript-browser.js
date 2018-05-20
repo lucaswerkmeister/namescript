@@ -18,7 +18,7 @@ $.when(
 				} else {
 					$promise = api.get(params);
 				}
-				$promise.then(resolve, reject);
+				$promise.then(resolve, function(code, result, result2, jqXh) { reject(result); });
 			});
 		},
 		clearDescriptions: false,
@@ -29,7 +29,11 @@ $.when(
 					"cursor": "pointer"
 				},
 				text: namescript.translate('add-button'),
-				click: add
+				click: function() {
+					return add().catch(function(result) {
+						namescript.config.errorActive(result.error.info);
+					});
+				}
 			}));
 		},
 		lang: mw.config.get('wgUserLanguage'),
@@ -56,5 +60,7 @@ $.when(
 		}
 	};
 	namescript.data = namescriptDataXhr[0];
-	namescript.start(entity);
+	namescript.start(entity).catch(function(e) {
+		namescript.config.errorActive(e);
+	});
 });
