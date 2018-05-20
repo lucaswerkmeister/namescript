@@ -74,9 +74,13 @@ async function main() {
 		password: config['auth']['password']
 	}).catch(die);
 
+	const randomHash = Math.floor(Math.random() * Math.pow(2, 48)).toString(16);
 	namescriptConfig = {
 		apiRequest: function(params) {
 			params.token = bot.editToken;
+			if (params.summary) {
+				params.summary = 'namescript: ' + params.summary + ' ([[:toollabs:editgroups/b/CB/' + randomHash + '|details]])';
+			}
 			return bot.request(params);
 		},
 		clearDescriptions: true,
@@ -265,7 +269,7 @@ async function prepareStuff(entity, name, desctype, script) {
 		'descriptions': jsonDesc,
 		'labels': jsonLabel,
 		'aliases': jsonAliases
-	}), entity.id, "Adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
+	}), entity.id, "adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
 }
 
 async function setItem(item, itemId, summary) {
@@ -293,7 +297,7 @@ async function clearDescriptions(entity) {
 		action: 'wbeditentity',
 		id: entity.id,
 		data: JSON.stringify(payload),
-		summary: 'Delete all descriptions (part of namescript)'
+		summary: 'deleting all existing descriptions before adding new ones'
 	});
 }
 
