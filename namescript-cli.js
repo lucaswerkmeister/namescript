@@ -15,10 +15,7 @@ async function main() {
 	}
 	const config = toml.parse(configStr);
 	if ('ui' in config && 'language' in config['ui']) {
-		const confLang = config['ui']['language'];
-		if (namescript.data.i18n.hasOwnProperty(confLang)) {
-			namescript.config.lang = confLang;
-		}
+		namescript.config.lang = config['ui']['language'];
 	}
 
 	const bot = new MWBot({

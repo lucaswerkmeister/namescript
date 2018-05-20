@@ -47,14 +47,15 @@ namescript = {
 		 */
 		nonScriptLangList: {}
 	},
-	start: async function() {} // actual implementation set at the end of this file
+	start: async function(entity) {} // actual implementation set at the end of this file
 };
 
 (function() {
 
 	/* Return localized message */
 	function translate(key) {
-		if (namescript.data.i18n[namescript.config.lang].hasOwnProperty(key)) {
+		if (namescript.data.i18n.hasOwnProperty(namescript.config.lang) &&
+			namescript.data.i18n[namescript.config.lang].hasOwnProperty(key)) {
 			return namescript.data.i18n[namescript.config.lang][key];
 		} else {
 			return namescript.data.i18n['en'][key];
