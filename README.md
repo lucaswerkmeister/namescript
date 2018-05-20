@@ -58,6 +58,21 @@ so depending on the current state of the sandbox items the above command may not
 (However, you can still use it to test if the configuration file is correct,
 since the script will attempt to login before looking at the items.)
 
+## User script usage
+
+You can also use the script in the browser on Wikidata, as a normal user script.
+The following command will upload the source code files to subpages of your user page on Wikidata:
+
+```sh
+node namescript-upload.js
+```
+
+Afterwards, load the `namescript.js` file in [your `common.js`](https://www.wikidata.org/wiki/Special:MyPage/common.js):
+
+```js
+mw.loader.load( '/w/index.php?title=User:YOUR_USERNAME/namescript.js&action=raw&ctype=text/javascript' );
+```
+
 ## Possible problems
 
 ### “command not found”
