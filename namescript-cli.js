@@ -28,8 +28,10 @@ async function main() {
 
 	const randomHash = Math.floor(Math.random() * Math.pow(2, 48)).toString(16);
 	namescript.config = {
-		apiRequest: function(params) {
-			params.token = bot.editToken;
+		apiRequest: function(params, withEditToken) {
+			if (withEditToken) {
+				params.token = bot.editToken;
+			}
 			if (params.summary) {
 				params.summary = 'namescript: ' + params.summary + ' ([[:toollabs:editgroups/b/CB/' + randomHash + '|details]])';
 			}

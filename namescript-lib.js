@@ -6,8 +6,8 @@
 
 namescript = {
 	config: { // filled in by namescript-browser.js or namescript-cli.js
-		// function to send an API request with the specified parameters
-		apiRequest: async function(params) {
+		// function to send an API request with the specified parameters, adding an edit token if necessary
+		apiRequest: async function(params, withEditToken) {
 			throw new Error('not implemented');
 		},
 		// whether to clear descriptions or not before adding new ones
@@ -186,7 +186,7 @@ namescript = {
 			data: item,
 			summary: summary,
 			exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases'
-		});
+		}, true);
 		if (data.success === 1) {
 			namescript.config.infoActive('Sent: ' + summary);
 		} else {
@@ -205,7 +205,7 @@ namescript = {
 			id: entity.id,
 			data: JSON.stringify(payload),
 			summary: 'deleting all existing descriptions before adding new ones'
-		});
+		}, true);
 	}
 
 	namescript.start = inserteditlinks;
