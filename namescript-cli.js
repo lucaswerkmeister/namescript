@@ -71,7 +71,7 @@ async function main() {
 			continue;
 		}
 		try {
-			await inserteditlinks(response['entities'][itemId]);
+			await namescript.start(response['entities'][itemId]);
 		} catch (e) {
 			console.error('Error while editing ' + itemId + '!');
 			console.error(e);

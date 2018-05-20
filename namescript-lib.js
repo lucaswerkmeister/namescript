@@ -90,7 +90,7 @@ namescript = {
 									return false;
 								}
 							}
-							namescript.config.prepareAdd(add);
+							await namescript.config.prepareAdd(add);
 						} else {
 							namescript.config.errorP31(translate('unknown-P282'));
 						}
