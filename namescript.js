@@ -3,58 +3,56 @@
   Updated by [[User:Tpt|Tpt]] and Harmonia Amanda
 */
 
-const toml = require('toml');
-const fs = require('fs');
-const MWBot = require('mwbot');
-
-const bot = new MWBot({
-	apiUrl: 'https://www.wikidata.org/w/api.php'
-});
-var lang = 'en';
-
-const {
-	// localized messages
-	i18n,
-	// description lists
-	descriptions,
-	// by default we use parenthesis ("$desc ($name)"), if not you should set something here
-	descriptionWithName,
-	// check for P1705
-	langlist,
-	// list of languages for aliases
-	aliaslanglist,
-	// list of supported scripts
-	supportedScripts,
-	/*
-	 * List of not the same script languages.
-	 *
-	 * We maintain two different languages lists, as sometimes, we need an alias
-	 * for a latin language: in Latvian, there is a mechanism to transliterate
-	 * latin names into Latvian.
-	 */
-	nonScriptLangList
-} = JSON.parse(fs.readFileSync('namescript-data.json', 'utf8'));
-
-let namescriptConfig = {
-	// function to send an API request with the specified parameters
-	apiRequest: function(params) {
-		throw new Error('not implemented');
+const namescript = {
+	config: {
+		// function to send an API request with the specified parameters
+		apiRequest: async function(params) {
+			throw new Error('not implemented');
+		},
+		// whether to clear descriptions or not before adding new ones
+		clearDescriptions: false,
+		// function to prepare adding the labels/etc., possibly waiting for user input before calling the async add() callback
+		prepareAdd: async function(add) {
+			throw new Error('not implemented');
+		},
+		// UI language code
+		lang: 'en',
+		// function to show an active informational message to the user
+		infoActive: function(message) {},
+		// function to show an active error message to the user
+		errorActive: function(message) {},
+		// function to attach an error message to the P31 statement
+		errorP31: function(message) {}
 	},
-	// whether to clear descriptions or not before adding new ones
-	clearDescriptions: false,
-	// function to prepare adding the labels/etc., possibly waiting for user input before calling the add() callback
-	prepareAdd: function(add) {
-		throw new Error('not implemented');
-	},
-	// function to show an active informational message to the user
-	infoActive: function(message) {},
-	// function to show an active error message to the user
-	errorActive: function(message) {},
-	// function to attach an error message to the P31 statement
-	errorP31: function(message) {}
+	data: {
+		// localized messages
+		i18n: {},
+		// description lists
+		descriptions: {},
+		// by default we use parenthesis ("$desc ($name)"), if not you should set something here
+		descriptionWithName: {},
+		// check for P1705
+		langlist: {},
+		// list of languages for aliases
+		aliaslanglist: {},
+		// list of supported scripts
+		supportedScripts: [],
+		/*
+		 * List of not the same script languages.
+		 *
+		 * We maintain two different languages lists, as sometimes, we need an alias
+		 * for a latin language: in Latvian, there is a mechanism to transliterate
+		 * latin names into Latvian.
+		 */
+		nonScriptLangList: {}
+	}
 };
 
 async function main() {
+	const toml = require('toml');
+	const fs = require('fs');
+	const MWBot = require('mwbot');
+
 	let configStr;
 	try {
 		configStr = fs.readFileSync('config.toml', 'utf8');
@@ -65,17 +63,21 @@ async function main() {
 	const config = toml.parse(configStr);
 	if ('ui' in config && 'language' in config['ui']) {
 		const confLang = config['ui']['language'];
-		if (i18n.hasOwnProperty(confLang)) {
-			lang = confLang;
+		if (namescript.data.i18n.hasOwnProperty(confLang)) {
+			namescript.config.lang = confLang;
 		}
 	}
+
+	const bot = new MWBot({
+		apiUrl: 'https://www.wikidata.org/w/api.php'
+	});
 	await bot.loginGetEditToken({
 		username: config['auth']['username'],
 		password: config['auth']['password']
 	}).catch(die);
 
 	const randomHash = Math.floor(Math.random() * Math.pow(2, 48)).toString(16);
-	namescriptConfig = {
+	namescript.config = {
 		apiRequest: function(params) {
 			params.token = bot.editToken;
 			if (params.summary) {
@@ -84,8 +86,8 @@ async function main() {
 			return bot.request(params);
 		},
 		clearDescriptions: true,
-		prepareAdd: function(add) {
-			add();
+		prepareAdd: async function(add) {
+			return await add();
 		},
 		infoActive: function(message) {
 			console.log(message);
@@ -97,6 +99,8 @@ async function main() {
 			console.error(message);
 		}
 	};
+
+	namescript.data = JSON.parse(fs.readFileSync('namescript-data.json', 'utf8'));
 
 	const deletedIds = [];
 	const failedIds = [];
@@ -148,10 +152,10 @@ function die(error) {
 
 /* Return localized message */
 function translate(key) {
-	if (i18n[lang].hasOwnProperty(key)) {
-		return i18n[lang][key];
+	if (namescript.data.i18n[namescript.config.lang].hasOwnProperty(key)) {
+		return namescript.data.i18n[namescript.config.lang][key];
 	} else {
-		return i18n['en'][key];
+		return namescript.data.i18n['en'][key];
 	}
 }
 
@@ -166,9 +170,9 @@ async function inserteditlinks(entity) {
 				if (claims["P282"]) {
 					const script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
 					
-					if(supportedScripts.indexOf(script) !== -1) {
+					if(namescript.data.supportedScripts.indexOf(script) !== -1) {
 						async function add() {
-							if (namescriptConfig.clearDescriptions) {
+							if (namescript.config.clearDescriptions) {
 								await clearDescriptions(entity);
 							}
 							if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
@@ -183,15 +187,15 @@ async function inserteditlinks(entity) {
 								return false;
 							}
 						}
-						namescriptConfig.prepareAdd(add);
+						namescript.config.prepareAdd(add);
 					} else {
-						namescriptConfig.errorP31(translate('unknown-P282'));
+						namescript.config.errorP31(translate('unknown-P282'));
 					}
 				} else {
-					namescriptConfig.errorP31(translate('no-P282'));
+					namescript.config.errorP31(translate('no-P282'));
 				}
 			} else {
-				namescriptConfig.errorP31(translate('no-P1705'));
+				namescript.config.errorP31(translate('no-P1705'));
 			}
 		} else {
 			return false;
@@ -200,19 +204,19 @@ async function inserteditlinks(entity) {
 }
 
 function isLatinLanguageCode(lang, script) {
-	return nonScriptLangList[script].indexOf(lang) === -1;
+	return namescript.data.nonScriptLangList[script].indexOf(lang) === -1;
 }
 
 function getDescription(lang, name, desctype, script) {
-	const description = descriptions[desctype][script][lang];
+	const description = namescript.data.descriptions[desctype][script][lang];
 
 	if (isLatinLanguageCode(lang, script)) {
 		return description;
 	}
 
 	var pattern = '$desc ($name)';
-	if (lang in descriptionWithName) {
-		pattern = descriptionWithName[lang];
+	if (lang in namescript.data.descriptionWithName) {
+		pattern = namescript.data.descriptionWithName[lang];
 	}
 	return pattern.replace('$desc', description).replace('$name', name);
 }
@@ -229,14 +233,14 @@ async function prepareStuff(entity, name, desctype, script) {
 	
 	var existinglabels = entity["labels"];
 	var newlanglist = [];
-	for (var i = 0; i < langlist[script].length; i++) {
-		if (!existinglabels[langlist[script][i]]) {
-			newlanglist.push(langlist[script][i]);
+	for (var i = 0; i < namescript.data.langlist[script].length; i++) {
+		if (!existinglabels[namescript.data.langlist[script][i]]) {
+			newlanglist.push(namescript.data.langlist[script][i]);
 		}
 	}
 	
 	if (newlanglist.length === 0) {
-		namescriptConfig.infoActive(translate('all-set'));
+		namescript.config.infoActive(translate('all-set'));
 	} else {
 		for (var j = 0; j < newlanglist.length; j++) {
 			countlabels++;
@@ -246,16 +250,16 @@ async function prepareStuff(entity, name, desctype, script) {
 			});
 		}
 	}
-	for (var j = 0; j < aliaslanglist[script].length; j++) {
+	for (var j = 0; j < namescript.data.aliaslanglist[script].length; j++) {
 		countaliases++;
 		jsonAliases.push( [{
-			language: aliaslanglist[script][j],
+			language: namescript.data.aliaslanglist[script][j],
 			value: name,
 			add: ""
 		}] );
 	}
 
-	for (const lang in descriptions[desctype][script]) {
+	for (const lang in namescript.data.descriptions[desctype][script]) {
 		if (!existingdescs[lang]) {
 			countdescs++;
 			jsonDesc.push({
@@ -273,7 +277,7 @@ async function prepareStuff(entity, name, desctype, script) {
 }
 
 async function setItem(item, itemId, summary) {
-	const data = await namescriptConfig.apiRequest({
+	const data = await namescript.config.apiRequest({
 		action: 'wbeditentity',
 		id: itemId,
 		data: item,
@@ -281,9 +285,9 @@ async function setItem(item, itemId, summary) {
 		exclude: 'pageid|ns|title|lastrevid|touched|sitelinks|aliases'
 	});
 	if (data.success === 1) {
-		namescriptConfig.infoActive('Sent: ' + summary);
+		namescript.config.infoActive('Sent: ' + summary);
 	} else {
-		namescriptConfig.errorActive(data);
+		namescript.config.errorActive(data);
 	}
 }
 
@@ -293,7 +297,7 @@ async function clearDescriptions(entity) {
 		payload.descriptions.push({ language: language, remove: '' });
 	}
 	entity.descriptions = {};
-	return await namescriptConfig.apiRequest({
+	return await namescript.config.apiRequest({
 		action: 'wbeditentity',
 		id: entity.id,
 		data: JSON.stringify(payload),
