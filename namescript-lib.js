@@ -47,7 +47,8 @@ namescript = {
 		 */
 		nonScriptLangList: {}
 	},
-	start: async function(entity) {} // actual implementation set at the end of this file
+	start: async function(entity) {}, // actual implementation set at the end of this file
+	translate: function(key) {} // actual implementation set at the end of this file
 };
 
 (function() {
@@ -209,4 +210,5 @@ namescript = {
 	}
 
 	namescript.start = inserteditlinks;
+	namescript.translate = translate;
 })();
