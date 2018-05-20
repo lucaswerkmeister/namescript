@@ -24,7 +24,9 @@ async function main() {
 	});
 
 	for (const file of ['namescript-lib.js', 'namescript-data.json', 'namescript-browser.js', 'namescript.js']) {
-		await bot.edit('User:' + username + '/' + file, fs.readFileSync(file, 'utf8'), 'Import from https://github.com/lucaswerkmeister/namescript');
+		let content = fs.readFileSync(file, 'utf8');
+		content = content.replace(/NAMESCRIPT_SOURCE_USER/g, username.replace(/ /g, '_'));
+		await bot.edit('User:' + username + '/' + file, content, 'Import from https://github.com/lucaswerkmeister/namescript');
 	}
 }
 
