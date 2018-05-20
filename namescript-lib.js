@@ -4,7 +4,7 @@
   Further butchered and rearranged by Lucas Werkmeister
 */
 
-const namescript = {
+namescript = {
 	config: { // filled in by namescript-browser.js or namescript-cli.js
 		// function to send an API request with the specified parameters
 		apiRequest: async function(params) {
