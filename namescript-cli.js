@@ -2,6 +2,7 @@ async function main() {
 	const toml = require('toml');
 	const fs = require('fs');
 	const MWBot = require('mwbot');
+	require('./namescript-lib.js');
 
 	let configStr;
 	try {
@@ -97,4 +98,4 @@ async function main() {
 	}
 }
 
-main();
+main().catch(console.error);
