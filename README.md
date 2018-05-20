@@ -61,17 +61,22 @@ since the script will attempt to login before looking at the items.)
 ## User script usage
 
 You can also use the script in the browser on Wikidata, as a normal user script.
+Add the following line to [your `common.js`](https://www.wikidata.org/wiki/Special:MyPage/common.js):
+
+```js
+mw.loader.load( '/w/index.php?title=User:Harmonia_Amanda/namescript.js&action=raw&ctype=text/javascript' );
+```
+
+If you want to make changes to the script, you can also upload it to your own user page.
+Please keep in mind that your copy of the script will not update automatically when the upstream version changes.
+
 The following command will upload the source code files to subpages of your user page on Wikidata:
 
 ```sh
 node namescript-upload.js
 ```
 
-Afterwards, load the `namescript.js` file in [your `common.js`](https://www.wikidata.org/wiki/Special:MyPage/common.js):
-
-```js
-mw.loader.load( '/w/index.php?title=User:YOUR_USERNAME/namescript.js&action=raw&ctype=text/javascript' );
-```
+Afterwards, replace `Harmonia_Amanda` with your own username in `common.js` to load your own version.
 
 ## Possible problems
 
