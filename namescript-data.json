@@ -55,6 +55,46 @@
             "no-P282": "Manca la proprietà P282! Aggiungila e aggiorna la pagina.",
             "unknown-P282": "Il sistema di scrittura non è supportato!",
             "all-set": "Tutte le etichette e le descrizioni sono già state aggiunte."
+        },
+        "oc": {
+            "title": "escript de nom",
+            "add-button": "Ajustatz d'etiquetas e de descripcions",
+            "no-P1705": "Cap de proprietat P1705 definida ! Definissètz-ne una e actualizatz la pagina.",
+            "no-P282": "Cap de proprietat P282 definida ! Definissètz-ne una e actualizatz la pagina.",
+            "unknown-P282": "L'escript es pas encara suportat.",
+            "all-set": "Totas las etiquetas e totas las descripcions son ja estadas definidas."
+        },
+        "de": {
+            "title": "Skriptname",
+            "add-button": "Füge Bezeichnungen und Beschreibungen hinzu.",
+            "no-P1705": "Keine P1705 Eigenschaft vorhanden! Setze eine und lade die Seite neu.",
+            "no-P282": "Keine P282 Eigenschaft vorhanden! Setze eine und lade die Seite neu.",
+            "unknown-P282": "Das Skript wird noch nicht unterstützt!",
+            "all-set": "Alle Bezeichnungen und Eigenschaften sind schon eingetragen."
+        },
+        "bg": {
+            "title": "Име на скрипта",
+            "add-button": "Добави надписи и описания",
+            "no-P1705": "Пропърти P1705 не съществува! Създайте го и заредете страницата отново.",
+            "no-P282": "Пропърти P282 не съществува! Създайте го и заредете страницата отново.",
+            "unknown-P282": "Скрипта не се поддържа все още!",
+            "all-set": "Всички надписи и описания вече са създадени."
+        },
+        "he": {
+            "title": "תסריט שמות",
+            "add-button": "הוספת תוויות ותיאורים",
+            "no-P1705": "מאפיין P1705 לא הוגדר! נא להגדיר אחד ולרענן את הדף.",
+            "no-P282": "מאפיין P282 לא הוגדר! נא להגדיר אחד ולרענן את הדף.",
+            "unknown-P282": "התסריט עדיין לא נתמך!",
+            "all-set": "כל התוויות והתיאורים כבר הוגדרו."
+        },
+        "ru": {
+            "title": "Скрипт для имён",
+            "add-button": "Добавить метки и описания",
+            "no-P1705": "Свойство P1705 не определено! Пожалуйста определите его и перезагрузите страницу.",
+            "no-P282": "Свойство P282 не определено! Пожалуйста определите его и перезагрузите страницу.",
+            "unknown-P282": "Скрипт пока не поддерживается.",
+            "all-set": "Все метки и описания уже были определены."
         }
     },
     "descriptions": {
