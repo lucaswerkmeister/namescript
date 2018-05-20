@@ -1,8 +1,3 @@
-function die(error) {
-	console.error(error);
-	process.exit(1);
-}
-
 async function main() {
 	const toml = require('toml');
 	const fs = require('fs');
@@ -12,8 +7,10 @@ async function main() {
 	try {
 		configStr = fs.readFileSync('config.toml', 'utf8');
 	} catch (e) {
-		die('config.toml file could not be read\n' +
-			'Please copy config.toml.example to config.toml and enter your own username and password');
+		console.error('config.toml file could not be read');
+		console.error('Please copy config.toml.example to config.toml and enter your own username and password');
+		process.exit(1);
+		return;
 	}
 	const config = toml.parse(configStr);
 	if ('ui' in config && 'language' in config['ui']) {
@@ -29,7 +26,7 @@ async function main() {
 	await bot.loginGetEditToken({
 		username: config['auth']['username'],
 		password: config['auth']['password']
-	}).catch(die);
+	});
 
 	const randomHash = Math.floor(Math.random() * Math.pow(2, 48)).toString(16);
 	namescript.config = {
@@ -66,7 +63,7 @@ async function main() {
 			action: 'wbgetentities',
 			ids: itemId,
 			props: 'labels|descriptions|claims'
-		}).catch(die);
+		});
 		const entity = response &&
 			  response['entities'] &&
 			  response['entities'][itemId];
