@@ -23,7 +23,7 @@ async function main() {
 		password: password
 	});
 
-	for (const file of ['namescript.js', 'namescript-lib.js', 'namescript-data.json', 'namescript-browser.js']) {
+	for (const file of ['namescript-lib.js', 'namescript-data.json', 'namescript-browser.js', 'namescript.js']) {
 		await bot.edit('User:' + username + '/' + file, fs.readFileSync(file, 'utf8'), 'Import from https://github.com/lucaswerkmeister/namescript');
 	}
 }
