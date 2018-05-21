@@ -4,6 +4,7 @@
   "description": "Automatically set labels, descriptions and aliases of name items, replacing all existing descriptions.",
   "main": "namescript.js",
   "dependencies": {
+    "line-by-line": "^0.1.6",
     "mwbot": "^1.0.10",
     "toml": "^2.3.3"
   },

@@ -1,6 +1,7 @@
 const toml = require('toml');
 const fs = require('fs');
 const MWBot = require('mwbot');
+const LineByLineReader = require('line-by-line');
 require('./namescript-lib.js');
 
 const bot = new MWBot({
@@ -58,8 +59,14 @@ async function main() {
 	const deletedIds = [];
 	const failedIds = [];
 	const errorInfos = [];
-	for (const itemId of process.argv.slice(2)) {
-		processItem(itemId, deletedIds, failedIds, errorInfos);
+	for (const argument of process.argv.slice(2)) {
+		if (argument.match(/^Q[1-9][0-9]*$/)) {
+			processItem(argument, deletedIds, failedIds, errorInfos);
+		} else if (fs.existsSync(argument)) {
+			processFile(argument, deletedIds, failedIds, errorInfos);
+		} else {
+			throw "Unrecognized argument: " + argument;
+		}
 	}
 	if (deletedIds.length) {
 		console.log('There was no data for the following item IDs: ' + deletedIds.join(', '));
@@ -72,6 +79,16 @@ async function main() {
 				console.log(errorInfo);
 			}
 		}
+	}
+}
+
+async function processFile(filename, deletedIds, failedIds, errorInfos) {
+	const lr = new LineByLineReader(filename),
+		  itemIds = [];
+	lr.on('line', function(itemId) { itemIds.push(itemId); });
+	await new Promise((accept, reject) => { lr.on('end', accept); lr.on('error', reject); });
+	for (const itemId of itemIds) {
+		processItem(itemId, deletedIds, failedIds, errorInfos);
 	}
 }
 
