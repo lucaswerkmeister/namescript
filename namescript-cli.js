@@ -101,4 +101,7 @@ async function processItem(bot, itemId, deletedIds, failedIds, errorInfos) {
 	}
 }
 
-main().catch(console.error);
+main().catch(function(error) {
+	console.error(error);
+	process.exit(1);
+});
