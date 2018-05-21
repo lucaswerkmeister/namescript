@@ -1,9 +1,9 @@
-async function main() {
-	const toml = require('toml');
-	const fs = require('fs');
-	const MWBot = require('mwbot');
-	require('./namescript-lib.js');
+const toml = require('toml');
+const fs = require('fs');
+const MWBot = require('mwbot');
+require('./namescript-lib.js');
 
+async function main() {
 	let configStr;
 	try {
 		configStr = fs.readFileSync('config.toml', 'utf8');
@@ -58,30 +58,7 @@ async function main() {
 	const failedIds = [];
 	const errorInfos = [];
 	for (const itemId of process.argv.slice(2)) {
-		console.log(itemId);
-		const response = await bot.request({
-			action: 'wbgetentities',
-			ids: itemId,
-			props: 'labels|descriptions|claims'
-		});
-		const entity = response &&
-			  response['entities'] &&
-			  response['entities'][itemId];
-		if (!entity || !entity['claims']) {
-			console.error('No data for ' + itemId + '!');
-			deletedIds.push(itemId);
-			continue;
-		}
-		try {
-			await namescript.start(response['entities'][itemId]);
-		} catch (e) {
-			console.error('Error while editing ' + itemId + '!');
-			console.error(e);
-			failedIds.push(itemId);
-			if (e.info) {
-				errorInfos.push(e.info);
-			}
-		}
+		processItem(bot, itemId, deletedIds, failedIds, errorInfos);
 	}
 	if (deletedIds.length) {
 		console.log('There was no data for the following item IDs: ' + deletedIds.join(', '));
@@ -93,6 +70,33 @@ async function main() {
 			for (const errorInfo of errorInfos) {
 				console.log(errorInfo);
 			}
+		}
+	}
+}
+
+async function processItem(bot, itemId, deletedIds, failedIds, errorInfos) {
+	console.log(itemId);
+	const response = await bot.request({
+		action: 'wbgetentities',
+		ids: itemId,
+		props: 'labels|descriptions|claims'
+	});
+	const entity = response &&
+		  response['entities'] &&
+		  response['entities'][itemId];
+	if (!entity || !entity['claims']) {
+		console.error('No data for ' + itemId + '!');
+		deletedIds.push(itemId);
+		return;
+	}
+	try {
+		await namescript.start(response['entities'][itemId]);
+	} catch (e) {
+		console.error('Error while editing ' + itemId + '!');
+		console.error(e);
+		failedIds.push(itemId);
+		if (e.info) {
+			errorInfos.push(e.info);
 		}
 	}
 }
