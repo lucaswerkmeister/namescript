@@ -3,6 +3,10 @@ const fs = require('fs');
 const MWBot = require('mwbot');
 require('./namescript-lib.js');
 
+const bot = new MWBot({
+	apiUrl: 'https://www.wikidata.org/w/api.php'
+});
+
 async function main() {
 	let configStr;
 	try {
@@ -18,9 +22,6 @@ async function main() {
 		namescript.config.lang = config['ui']['language'];
 	}
 
-	const bot = new MWBot({
-		apiUrl: 'https://www.wikidata.org/w/api.php'
-	});
 	await bot.loginGetEditToken({
 		username: config['auth']['username'],
 		password: config['auth']['password']
@@ -58,7 +59,7 @@ async function main() {
 	const failedIds = [];
 	const errorInfos = [];
 	for (const itemId of process.argv.slice(2)) {
-		processItem(bot, itemId, deletedIds, failedIds, errorInfos);
+		processItem(itemId, deletedIds, failedIds, errorInfos);
 	}
 	if (deletedIds.length) {
 		console.log('There was no data for the following item IDs: ' + deletedIds.join(', '));
@@ -74,7 +75,7 @@ async function main() {
 	}
 }
 
-async function processItem(bot, itemId, deletedIds, failedIds, errorInfos) {
+async function processItem(itemId, deletedIds, failedIds, errorInfos) {
 	console.log(itemId);
 	const response = await bot.request({
 		action: 'wbgetentities',
