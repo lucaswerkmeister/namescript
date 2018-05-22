@@ -42,6 +42,7 @@ run the following command (inside the `namescript` directory):
 
 ```sh
 git pull
+npm install
 ```
 
 ## Usage
