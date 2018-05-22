@@ -61,9 +61,9 @@ async function main() {
 	const errorInfos = [];
 	for (const argument of process.argv.slice(2)) {
 		if (argument.match(/^Q[1-9][0-9]*$/)) {
-			processItem(argument, deletedIds, failedIds, errorInfos);
+			await processItem(argument, deletedIds, failedIds, errorInfos);
 		} else if (fs.existsSync(argument)) {
-			processFile(argument, deletedIds, failedIds, errorInfos);
+			await processFile(argument, deletedIds, failedIds, errorInfos);
 		} else {
 			throw "Unrecognized argument: " + argument;
 		}
@@ -88,7 +88,7 @@ async function processFile(filename, deletedIds, failedIds, errorInfos) {
 	lr.on('line', function(itemId) { itemIds.push(itemId); });
 	await new Promise((accept, reject) => { lr.on('end', accept); lr.on('error', reject); });
 	for (const itemId of itemIds) {
-		processItem(itemId, deletedIds, failedIds, errorInfos);
+		await processItem(itemId, deletedIds, failedIds, errorInfos);
 	}
 }
 
