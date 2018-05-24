@@ -94,20 +94,20 @@ async function processFile(filename, deletedIds, failedIds, errorInfos) {
 
 async function processItem(itemId, deletedIds, failedIds, errorInfos) {
 	console.log(itemId);
-	const response = await bot.request({
-		action: 'wbgetentities',
-		ids: itemId,
-		props: 'labels|descriptions|claims'
-	});
-	const entity = response &&
-		  response['entities'] &&
-		  response['entities'][itemId];
-	if (!entity || !entity['claims']) {
-		console.error('No data for ' + itemId + '!');
-		deletedIds.push(itemId);
-		return;
-	}
 	try {
+		const response = await bot.request({
+			action: 'wbgetentities',
+			ids: itemId,
+			props: 'labels|descriptions|claims'
+		});
+		const entity = response &&
+			  response['entities'] &&
+			  response['entities'][itemId];
+		if (!entity || !entity['claims']) {
+			console.error('No data for ' + itemId + '!');
+			deletedIds.push(itemId);
+			return;
+		}
 		await namescript.start(response['entities'][itemId]);
 	} catch (e) {
 		console.error('Error while editing ' + itemId + '!');
