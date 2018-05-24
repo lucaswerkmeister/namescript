@@ -7,6 +7,7 @@ require('./namescript-lib.js');
 const bot = new MWBot({
 	apiUrl: 'https://www.wikidata.org/w/api.php'
 });
+let lastItemId = null;
 
 async function main() {
 	let configStr;
@@ -59,14 +60,21 @@ async function main() {
 	const deletedIds = [];
 	const failedIds = [];
 	const errorInfos = [];
-	for (const argument of process.argv.slice(2)) {
-		if (isItemId(argument)) {
-			await processItem(argument, deletedIds, failedIds, errorInfos);
-		} else if (fs.existsSync(argument)) {
-			await processFile(argument, deletedIds, failedIds, errorInfos);
-		} else {
-			throw "Unrecognized argument: " + argument;
+	try {
+		for (const argument of process.argv.slice(2)) {
+			if (isItemId(argument)) {
+				await processItem(argument, deletedIds, failedIds, errorInfos);
+			} else if (fs.existsSync(argument)) {
+				await processFile(argument, deletedIds, failedIds, errorInfos);
+			} else {
+				throw "Unrecognized argument: " + argument;
+			}
 		}
+	} catch (e) {
+		console.error('BUG: unhandled error during processing, aborting');
+		console.error(e);
+		console.error('The last item ID we started working on was: ' + lastItemId);
+		failedIds.push(lastItemId);
 	}
 	if (deletedIds.length) {
 		console.log('There was no data for the following item IDs: ' + deletedIds.join(', '));
@@ -102,6 +110,7 @@ async function processItem(itemId, deletedIds, failedIds, errorInfos) {
 		return;
 	}
 	console.log(itemId);
+	lastItemId = itemId;
 	try {
 		const response = await bot.request({
 			action: 'wbgetentities',
