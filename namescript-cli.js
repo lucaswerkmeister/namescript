@@ -60,7 +60,7 @@ async function main() {
 	const failedIds = [];
 	const errorInfos = [];
 	for (const argument of process.argv.slice(2)) {
-		if (argument.match(/^Q[1-9][0-9]*$/)) {
+		if (isItemId(argument)) {
 			await processItem(argument, deletedIds, failedIds, errorInfos);
 		} else if (fs.existsSync(argument)) {
 			await processFile(argument, deletedIds, failedIds, errorInfos);
@@ -82,6 +82,10 @@ async function main() {
 	}
 }
 
+function isItemId(string) {
+	return string.match(/^Q[1-9][0-9]*$/);
+}
+
 async function processFile(filename, deletedIds, failedIds, errorInfos) {
 	const lr = new LineByLineReader(filename),
 		  itemIds = [];
@@ -93,6 +97,10 @@ async function processFile(filename, deletedIds, failedIds, errorInfos) {
 }
 
 async function processItem(itemId, deletedIds, failedIds, errorInfos) {
+	if (!isItemId(itemId)) {
+		console.error('Not a valid item ID: ' + itemId);
+		return;
+	}
 	console.log(itemId);
 	try {
 		const response = await bot.request({
