@@ -6,6 +6,7 @@
             "no-P1705": "No P1705 property set! Set one and refresh the page.",
             "no-P282": "No P282 property set! Set one and refresh the page.",
             "unknown-P282": "The script is not supported yet!",
+            "no-P1814": "No P1814 property set! Set one and refresh the page.",
             "all-set": "All labels and descriptions have already been set."
         },
         "fr": {
@@ -14,6 +15,7 @@
             "no-P1705": "Pas de propriété P1705 ! Ajoutez-la et rafraîchissez la page.",
             "no-P282": "Pas de propriété P282 ! Ajoutez-la et rafraîchissez la page.",
             "unknown-P282": "Le système d'écriture n'est pas encore géré!",
+            "no-P1814": "Pas de propriété P1814 ! Ajoutez-la et rafraîchissez la page.",
             "all-set": "Tous les libellés et descriptions sont déjà présents."
         },
         "nb": {
@@ -22,6 +24,7 @@
             "no-P1705": "Ingen P1705-utsagn! Legg til det og oppdater siden.",
             "no-P282": "Ingen P282-utsagn! Legg til det og oppdater siden.",
             "unknown-P282": "Dette skrivesystemet støttes ikke enda",
+            "no-P1814": "Ingen P1814-utsagn! Legg til det og oppdater siden.",
             "all-set": "Alle etiketter og beskrivelser er allerede satt."
         },
         "nn": {
@@ -30,6 +33,7 @@
             "no-P1705": "Det er ikkje noko P1705-utsagn. Føy det til og oppdater sida.",
             "no-P282": "Det er ikkje noko P282-utsagn. Føy det til og oppdater sida.",
             "unknown-P282": "The script is not supported yet!",
+            "no-P1814": "Det er ikkje noko P1814-utsagn. Føy det til og oppdater sida.",
             "all-set": "Alle etikettar og skildringar er har blitt sett allereie."
         },
         "nl": {
@@ -38,6 +42,7 @@
             "no-P1705": "Er is geen P1705 eigenschap! Voeg er dewe toe en ververs de pagina.",
             "no-P282": "Er is geen P282 eigenschap! Voeg er dewe toe en ververs de pagina.",
             "unknown-P282": "Het script ondersteunt dit alfabet nog niet!",
+            "no-P1814": "Er is geen P1814 eigenschap! Voeg er dewe toe en ververs de pagina.",
             "all-set": "Alle labels en beschrijvingen zijn al compleet."
         },
         "es": {
@@ -46,6 +51,7 @@
             "no-P1705": "No hay P1705! Añadela y actualiza la pagina.",
             "no-P282": "No hay P282! Añadela y actualiza la pagina.",
             "unknown-P282": "El sistema de escritura no està suportado!",
+            "no-P1814": "No hay P1814! Añadela y actualiza la pagina.",
             "all-set": "Todas las etiquetas y descripciones ya estan añadidas."
         },
         "it": {
@@ -54,6 +60,7 @@
             "no-P1705": "Manca la proprietà P1705! Aggiungila e aggiorna la pagina.",
             "no-P282": "Manca la proprietà P282! Aggiungila e aggiorna la pagina.",
             "unknown-P282": "Il sistema di scrittura non è supportato!",
+            "no-P1814": "Manca la proprietà P1814! Aggiungila e aggiorna la pagina.",
             "all-set": "Tutte le etichette e le descrizioni sono già state aggiunte."
         },
         "oc": {
@@ -62,6 +69,7 @@
             "no-P1705": "Cap de proprietat P1705 definida ! Definissètz-ne una e actualizatz la pagina.",
             "no-P282": "Cap de proprietat P282 definida ! Definissètz-ne una e actualizatz la pagina.",
             "unknown-P282": "L'escript es pas encara suportat.",
+            "no-P1814": "Cap de proprietat P1814 definida ! Definissètz-ne una e actualizatz la pagina.",
             "all-set": "Totas las etiquetas e totas las descripcions son ja estadas definidas."
         },
         "de": {
@@ -70,6 +78,7 @@
             "no-P1705": "Keine P1705 Eigenschaft vorhanden! Setze eine und lade die Seite neu.",
             "no-P282": "Keine P282 Eigenschaft vorhanden! Setze eine und lade die Seite neu.",
             "unknown-P282": "Das Skript wird noch nicht unterstützt!",
+            "no-P1814": "Keine P1814 Eigenschaft vorhanden! Setze eine und lade die Seite neu.",
             "all-set": "Alle Bezeichnungen und Eigenschaften sind schon eingetragen."
         },
         "bg": {
@@ -78,6 +87,7 @@
             "no-P1705": "Пропърти P1705 не съществува! Създайте го и заредете страницата отново.",
             "no-P282": "Пропърти P282 не съществува! Създайте го и заредете страницата отново.",
             "unknown-P282": "Скрипта не се поддържа все още!",
+            "no-P1814": "Пропърти P1814 не съществува! Създайте го и заредете страницата отново.",
             "all-set": "Всички надписи и описания вече са създадени."
         },
         "he": {
@@ -86,6 +96,7 @@
             "no-P1705": "מאפיין P1705 לא הוגדר! נא להגדיר אחד ולרענן את הדף.",
             "no-P282": "מאפיין P282 לא הוגדר! נא להגדיר אחד ולרענן את הדף.",
             "unknown-P282": "התסריט עדיין לא נתמך!",
+            "no-P1814": "מאפיין P1814 לא הוגדר! נא להגדיר אחד ולרענן את הדף.",
             "all-set": "כל התוויות והתיאורים כבר הוגדרו."
         },
         "ru": {
@@ -94,6 +105,7 @@
             "no-P1705": "Свойство P1705 не определено! Пожалуйста определите его и перезагрузите страницу.",
             "no-P282": "Свойство P282 не определено! Пожалуйста определите его и перезагрузите страницу.",
             "unknown-P282": "Скрипт пока не поддерживается.",
+            "no-P1814": "Свойство P1814 не определено! Пожалуйста определите его и перезагрузите страницу.",
             "all-set": "Все метки и описания уже были определены."
         }
     },

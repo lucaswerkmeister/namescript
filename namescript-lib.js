@@ -73,6 +73,10 @@ namescript = {
 
 					if (claims["P282"]) {
 						const script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
+
+						const nameInKana = "P1814" in claims ?
+							claims["P1814"][0]["mainsnak"]["datavalue"]["value"] :
+							null;
 						
 						if(namescript.data.supportedScripts.indexOf(script) !== -1) {
 							async function add() {
@@ -80,13 +84,13 @@ namescript = {
 									await clearDescriptions(entity);
 								}
 								if (instanceOf == "Q101352" || instanceOf == "Q29042997") {
-									await prepareStuff(entity, name, "surname", script);
+									await prepareStuff(entity, name, nameInKana, "surname", script);
 								} else if (instanceOf == "Q12308941") {
-									await prepareStuff(entity, name, "male given name", script);
+									await prepareStuff(entity, name, nameInKana, "male given name", script);
 								} else if (instanceOf == "Q11879590") {
-									await prepareStuff(entity, name, "female given name", script);
+									await prepareStuff(entity, name, nameInKana, "female given name", script);
 								} else if (instanceOf == "Q3409032") {
-									await prepareStuff(entity, name, "unisex given name", script);
+									await prepareStuff(entity, name, nameInKana, "unisex given name", script);
 								} else {
 									return false;
 								}
@@ -111,11 +115,21 @@ namescript = {
 		return namescript.data.nonScriptLangList[script].indexOf(lang) === -1;
 	}
 
-	function getDescription(lang, name, desctype, script) {
+	function getDescription(lang, name, nameInKana, desctype, script) {
 		const description = namescript.data.descriptions[desctype][script][lang];
 
 		if (isLatinLanguageCode(lang, script)) {
-			return description;
+			if (lang === 'ja' && script === 'Q82772') {
+				// in Japanese, the name (P1705, native label, kanji) is not unique between name items, only the name in kana (P1814) is
+				if (nameInKana) {
+					return description + ' (' + nameInKana + ')';
+				} else {
+					namescript.errorP31(translate('no-P1814'));
+					return description; // better than nothing, even though it will probably conflict
+				}
+			} else {
+				return description;
+			}
 		}
 
 		var pattern = '$desc ($name)';
@@ -125,7 +139,7 @@ namescript = {
 		return pattern.replace('$desc', description).replace('$name', name);
 	}
 
-	async function prepareStuff(entity, name, desctype, script) {
+	async function prepareStuff(entity, name, nameInKana, desctype, script) {
 		var countlabels = 0;
 		var countdescs = 0;
 		var countaliases = 0;
@@ -168,7 +182,7 @@ namescript = {
 				countdescs++;
 				jsonDesc.push({
 					language: lang,
-					value: getDescription(lang, name, desctype, script)
+					value: getDescription(lang, name, nameInKana, desctype, script)
 				});
 			}
 		}
