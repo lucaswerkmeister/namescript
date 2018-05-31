@@ -175,6 +175,14 @@ namescript = {
 				value: name,
 				add: ""
 			}] );
+			if (nameInKana && script === 'Q82772') {
+				countaliases++;
+				jsonAliases.push( [{
+					language: namescript.data.aliaslanglist[script][j],
+					value: nameInKana,
+					add: ""
+				}] );
+			}
 		}
 
 		for (const lang in namescript.data.descriptions[desctype][script]) {
