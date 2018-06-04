@@ -8,6 +8,9 @@ const bot = new MWBot({
 	apiUrl: 'https://www.wikidata.org/w/api.php'
 });
 let lastItemId = null;
+const deletedIds = [];
+const failedIds = [];
+const errorInfos = [];
 
 async function main() {
 	let configStr;
@@ -57,15 +60,12 @@ async function main() {
 
 	namescript.data = JSON.parse(fs.readFileSync('namescript-data.json', 'utf8'));
 
-	const deletedIds = [];
-	const failedIds = [];
-	const errorInfos = [];
 	try {
 		for (const argument of process.argv.slice(2)) {
 			if (isItemId(argument)) {
-				await processItem(argument, deletedIds, failedIds, errorInfos);
+				await processItem(argument);
 			} else if (fs.existsSync(argument)) {
-				await processFile(argument, deletedIds, failedIds, errorInfos);
+				await processFile(argument);
 			} else {
 				throw "Unrecognized argument: " + argument;
 			}
@@ -94,17 +94,17 @@ function isItemId(string) {
 	return string.match(/^Q[1-9][0-9]*$/);
 }
 
-async function processFile(filename, deletedIds, failedIds, errorInfos) {
+async function processFile(filename) {
 	const lr = new LineByLineReader(filename),
 		  itemIds = [];
 	lr.on('line', function(itemId) { itemIds.push(itemId); });
 	await new Promise((accept, reject) => { lr.on('end', accept); lr.on('error', reject); });
 	for (const itemId of itemIds) {
-		await processItem(itemId, deletedIds, failedIds, errorInfos);
+		await processItem(itemId);
 	}
 }
 
-async function processItem(itemId, deletedIds, failedIds, errorInfos) {
+async function processItem(itemId) {
 	if (!isItemId(itemId)) {
 		console.error('Not a valid item ID: ' + itemId);
 		return;
