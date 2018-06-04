@@ -36,6 +36,10 @@ Optionally, you can choose a different language than English as well.
 nano config.toml
 ```
 
+Instead of entering your normal account credentials,
+you can also [create a bot password](https://www.wikidata.org/wiki/Special:BotPasswords) and use that,
+which is slightly safer and also works if you have [two-factor authentication](https://meta.wikimedia.org/wiki/Special:MyLanguage/Help:Two-factor_authentication) enabled.
+
 This setup only needs to be run once;
 afterwards, to update to a newer version of the software,
 run the following command (inside the `namescript` directory):
