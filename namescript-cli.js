@@ -32,13 +32,13 @@ async function main() {
 		password: config['auth']['password']
 	});
 
-	const randomHash = Math.floor(Math.random() * Math.pow(2, 48)).toString(16);
+	let randomHash = Math.floor(Math.random() * Math.pow(2, 48)).toString(16);
 	namescript.config = {
 		apiRequest: function(params, withEditToken) {
 			if (withEditToken) {
 				params.token = bot.editToken;
 			}
-			if (params.summary) {
+			if (params.summary && randomHash) {
 				params.summary = 'namescript: ' + params.summary + ' ([[:toollabs:editgroups/b/CB/' + randomHash + '|details]])';
 			}
 			return bot.request(params);
@@ -66,6 +66,11 @@ async function main() {
 				await processItem(argument);
 			} else if (fs.existsSync(argument)) {
 				await processFile(argument);
+			} else if (argument === 'sandbox') {
+				const randomHash_ = randomHash;
+				randomHash = null;
+				await processSandbox('Q4115189');
+				randomHash = randomHash_;
 			} else {
 				throw "Unrecognized argument: " + argument;
 			}
@@ -102,6 +107,27 @@ async function processFile(filename) {
 	for (const itemId of itemIds) {
 		await processItem(itemId);
 	}
+}
+
+async function processSandbox(sandboxItemId) {
+	console.log(`Item page: https://www.wikidata.org/wiki/${sandboxItemId}`);
+	console.log(`History:   https://www.wikidata.org/wiki/${sandboxItemId}?action=history`);
+	const claims = {
+		P31: '{"entity-type": "item", "id": "Q12308941"}', // instance of: male given name
+		P1705: '{"language": "en", "text": "sandbox given name"}', // native label: sandbox given name (English)
+		P282: '{"entity-type": "item", "id": "Q8229"}' // writing system: Latin script
+	};
+	for (const [propertyId, value] of Object.entries(claims)) {
+		await bot.request({
+			action: 'wbcreateclaim',
+			entity: sandboxItemId,
+			snaktype: 'value',
+			property: propertyId,
+			value: value,
+			token: bot.editToken
+		});
+	}
+	await processItem(sandboxItemId);
 }
 
 async function processItem(itemId) {
