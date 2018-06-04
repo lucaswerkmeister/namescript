@@ -42,7 +42,7 @@ which is slightly safer and also works if you have [two-factor authentication](h
 
 This setup only needs to be run once;
 afterwards, to update to a newer version of the software,
-run the following command (inside the `namescript` directory):
+run the following commands (inside the `namescript` directory):
 
 ```sh
 git pull
