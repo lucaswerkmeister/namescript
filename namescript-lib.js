@@ -23,7 +23,9 @@ namescript = {
 		// function to show an active error message to the user
 		errorActive: function(message) {},
 		// function to attach an error message to the P31 statement
-		errorP31: function(message) {}
+		errorP31: function(message) {},
+		// function to show an active error message to the user, only in the CLI version
+		errorCLI: function(message) {},
 	},
 	data: { // loaded from namescript-data.json by namescript-browser.js or namescript-cli.js
 		// localized messages
@@ -106,8 +108,12 @@ namescript = {
 					namescript.config.errorP31(translate('no-P1705'));
 				}
 			} else {
+				// only report unknown or missing P31 in the CLI version
+				namescript.config.errorCLI(translate('unknown-P31'));
 				return false;
 			}
+		} else {
+			namescript.config.errorCLI(translate('missing-P31'));
 		}
 	}
 

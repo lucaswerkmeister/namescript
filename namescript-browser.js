@@ -57,7 +57,8 @@ $.when(
 					"color": "#f00"
 				}
 			}));
-		}
+		},
+		errorCLI: function(message) {},
 	};
 	namescript.data = namescriptDataXhr[0];
 	namescript.start(entity).catch(function(e) {

@@ -55,7 +55,10 @@ async function main() {
 		},
 		errorP31: function(message) {
 			console.error(message);
-		}
+		},
+		errorCLI: function(message) {
+			console.error(message);
+		},
 	};
 
 	namescript.data = JSON.parse(fs.readFileSync('namescript-data.json', 'utf8'));
