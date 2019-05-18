@@ -65,6 +65,9 @@ namescript = {
 		}
 	}
 
+	/**
+	 * @param {object} entity An entity JSON object.
+	 */
 	async function inserteditlinks(entity) {
 		const claims = entity['claims'];
 		if (claims["P31"]) {
@@ -117,10 +120,25 @@ namescript = {
 		}
 	}
 
+	/**
+	 * Whether the given language is written using the given script.
+	 * @param {string} lang MediaWiki language code.
+	 * @param {string} script Wikidata item ID for the script.
+	 * @return {bool}
+	 */
 	function isLatinLanguageCode(lang, script) {
 		return namescript.data.nonScriptLangList[script].indexOf(lang) === -1;
 	}
 
+	/**
+	 * Get the description for a name.
+	 * @param {string} lang The language of the description.
+	 * @param {string} name The native label statement value of the name item.
+	 * @param {?string} nameInKana The name in kana statement value of the name item.
+	 * @param {desctype} desctype One of "surname", "male given name", "female given name", "unisex given name"
+	 * @param {string} script The writing system statement value of the name item.
+	 * @return {string}
+	 */
 	function getDescription(lang, name, nameInKana, desctype, script) {
 		const description = namescript.data.descriptions[desctype][script][lang];
 
@@ -145,6 +163,12 @@ namescript = {
 		return pattern.replace('$desc', description).replace('$name', name);
 	}
 
+	/**
+	 * @param {object} entity An entity JSON object.
+	 * @param {string} name The native label statement value of the name item.
+	 * @param {?string} nameInKana The name in kana statement value of the name item.
+	 * @param {desctype} desctype One of "surname", "male given name", "female given name", "unisex given name"
+	 */
 	async function prepareStuff(entity, name, nameInKana, desctype, script) {
 		var countlabels = 0;
 		var countdescs = 0;
@@ -208,6 +232,12 @@ namescript = {
 		}), entity.id, "adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
 	}
 
+	/**
+	 * Edit an entity.
+	 * @param {object} item The entity data.
+	 * @param {string} itemId The entity ID.
+	 * @param {string} summary The summary for the edit.
+	 */
 	async function setItem(item, itemId, summary) {
 		const data = await namescript.config.apiRequest({
 			action: 'wbeditentity',
@@ -223,6 +253,10 @@ namescript = {
 		}
 	}
 
+	/**
+	 * Remove all the descriptions of an entity.
+	 * @param {object} entity The entity data.
+	 */
 	async function clearDescriptions(entity) {
 		const payload = { descriptions: [] };
 		for (const language in entity.descriptions) {
