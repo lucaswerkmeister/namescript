@@ -66,6 +66,22 @@ namescript = {
 	}
 
 	/**
+	 * Return the comma-separator message for the given language.
+	 * @param {string} lang MediaWiki language code.
+	 * @return {string}
+	 */
+	function commaSeparator(lang) {
+		// getting it from the API is super slow, so we just hard-code it :/
+		if (/^(?:ar|fa)(?:-.*)?$/.test(lang)) {
+			return '، ';
+		}
+		if (/^(?:gan|ja|lzh|yue|zh)(?:-.*)?$/.test(lang)) {
+			return '、';
+		}
+		return ', ';
+	}
+
+	/**
 	 * @param {object} entity An entity JSON object.
 	 */
 	async function inserteditlinks(entity) {
@@ -152,7 +168,7 @@ namescript = {
 			if (lang === 'ja') {
 				name = nameInKana; // the native label is already in the label
 			} else {
-				name = name + ', ' + nameInKana; // TODO use comma-separator message
+				name = name + commaSeparator(lang) + nameInKana;
 			}
 		} else if (isLatinLanguageCode(lang, script)) {
 			return description;
