@@ -142,18 +142,20 @@ namescript = {
 	function getDescription(lang, name, nameInKana, desctype, script) {
 		const description = namescript.data.descriptions[desctype][script][lang];
 
-		if (isLatinLanguageCode(lang, script)) {
-			if (lang === 'ja' && script === 'Q82772') {
-				// in Japanese, the name (P1705, native label, kanji) is not unique between name items, only the name in kana (P1814) is
-				if (nameInKana) {
-					return description + ' (' + nameInKana + ')';
-				} else {
-					namescript.errorP31(translate('no-P1814'));
-					return description; // better than nothing, even though it will probably conflict
-				}
-			} else {
-				return description;
+		if (script === 'Q82772') { // kanji
+			// neither the kanji (name) nor the kana (nameInKana) is unique on its own,
+			// so use the combination of both for the description
+			if (nameInKana === null) {
+				namescript.config.errorP31(translate('no-P1814'));
+				return description; // better than nothing, even though it will probably conflict
 			}
+			if (lang === 'ja') {
+				name = nameInKana; // the native label is already in the label
+			} else {
+				name = name + ', ' + nameInKana; // TODO use comma-separator message
+			}
+		} else if (isLatinLanguageCode(lang, script)) {
+			return description;
 		}
 
 		var pattern = '$desc ($name)';
