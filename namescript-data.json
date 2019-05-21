@@ -8,8 +8,8 @@
             "unknown-P282": "The script is not supported yet!",
             "no-P1814": "No P1814 property set! Set one and refresh the page.",
             "all-set": "All labels and descriptions have already been set.",
-			"unknown-P31": "Unknown P31 value! (Keep in mind only the first statement is used.)",
-			"missing-P31": "Missing P31 statement!"
+            "unknown-P31": "Unknown P31 value! (Keep in mind only the first statement is used.)",
+            "missing-P31": "Missing P31 statement!"
         },
         "fr": {
             "title": "Name script",
