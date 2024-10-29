@@ -41,6 +41,7 @@ async function main() {
 			if (params.summary && randomHash) {
 				params.summary = 'namescript: ' + params.summary + ' ([[:toollabs:editgroups/b/CB/' + randomHash + '|details]])';
 			}
+			params.assert = 'user';
 			return bot.request(params);
 		},
 		clearDescriptions: true,

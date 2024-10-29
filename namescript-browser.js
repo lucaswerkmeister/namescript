@@ -14,7 +14,7 @@ $.when(
 			return new Promise(function(resolve, reject) {
 				let $promise;
 				if (withEditToken) {
-					$promise = api.postWithEditToken(params);
+					$promise = api.postWithEditToken(api.assertCurrentUser(params));
 				} else {
 					$promise = api.get(params);
 				}
