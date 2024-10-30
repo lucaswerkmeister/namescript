@@ -28,17 +28,25 @@ Copy the configuration file…
 cp config.toml.example config.toml
 ```
 
-…and edit it with your favorite editor to insert your Wikimedia username and password.
-(You can also do this step with a graphical editor, if you like.)
+…and edit it with your favorite editor to insert your Wikimedia username and password (see below).
 Optionally, you can choose a different language than English as well.
 
 ```sh
 nano config.toml
+# if you like, you can use a graphical editor instead to edit the file
 ```
 
 Instead of entering your normal account credentials,
 you can also [create a bot password](https://www.wikidata.org/wiki/Special:BotPasswords) and use that,
 which is slightly safer and also works if you have [two-factor authentication](https://meta.wikimedia.org/wiki/Special:MyLanguage/Help:Two-factor_authentication) enabled.
+The bot password will require the grants “edit existing pages” and “edit your user CSS/JSON/JavaScript“;
+optionally, you can also set the “allowed pages for editing” to the following
+(with your user name instead of “Harmonia Amanda”):
+
+* `User:Harmonia Amanda/namescript-lib.js`
+* `User:Harmonia Amanda/namescript-data.json`
+* `User:Harmonia Amanda/namescript-browser.js`
+* `User:Harmonia Amanda/namescript.js`
 
 This setup only needs to be run once;
 afterwards, to update to a newer version of the software,

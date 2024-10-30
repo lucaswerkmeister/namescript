@@ -1,6 +1,9 @@
 [auth]
 username = 'Your username'
 password = 'Your password'
+# if you are using a bot password, the credentials should look like this:
+# username = 'Your username@namescript'
+# password = 'somerandom32characterslongstring'
 
 [ui]
 language = "en"
