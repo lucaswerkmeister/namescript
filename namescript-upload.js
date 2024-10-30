@@ -12,16 +12,14 @@ async function main() {
 		process.exit(1);
 		return;
 	}
-	const config = toml.parse(configStr),
-		  username = config['auth']['username'],
-		  password = config['auth']['password'];
+	const config = toml.parse(configStr);
 	const bot = new MWBot({
 		apiUrl: 'https://www.wikidata.org/w/api.php'
 	});
-	await bot.loginGetEditToken({
-		username: username,
-		password: password
-	});
+	const username = (await bot.loginGetEditToken({
+		username: config['auth']['username'],
+		password: config['auth']['password']
+	})).lgusername;
 
 	for (const file of ['namescript-lib.js', 'namescript-data.json', 'namescript-browser.js', 'namescript.js']) {
 		let content = fs.readFileSync(file, 'utf8');
