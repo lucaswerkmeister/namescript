@@ -36,12 +36,13 @@ nano config.toml
 # if you like, you can use a graphical editor instead to edit the file
 ```
 
-Instead of entering your normal account credentials,
-you can also [create a bot password](https://www.wikidata.org/wiki/Special:BotPasswords) and use that,
-which is slightly safer and also works if you have [two-factor authentication](https://meta.wikimedia.org/wiki/Special:MyLanguage/Help:Two-factor_authentication) enabled.
-The bot password will require the grants “edit existing pages” and “edit your user CSS/JSON/JavaScript“;
-optionally, you can also set the “allowed pages for editing” to the following
-(with your user name instead of “Harmonia Amanda”):
+It’s recommended to use a [bot password](https://www.wikidata.org/wiki/Special:BotPasswords) instead of your normal username and password:
+this is slightly safer, and it’s not clear if using the normal password still works at all
+(it certainly doesn’t work if your account has [two-factor authentication](https://meta.wikimedia.org/wiki/Special:MyLanguage/Help:Two-factor_authentication) enabled).
+The bot password will require the grants “edit existing pages” and “edit your user CSS/JSON/JavaScript“.
+Optionally, you can also set the “allowed pages for editing” to the following
+(with your user name instead of “Harmonia Amanda”) –
+in this case the bot password will only be usable for updating the on-wiki user script with `node namescript-upload.js`:
 
 * `User:Harmonia Amanda/namescript-lib.js`
 * `User:Harmonia Amanda/namescript-data.json`
@@ -66,7 +67,10 @@ For example, the following command will adjust the two Wikidata sandbox items:
 node namescript.js Q4115189 Q13406268
 ```
 
-Note that the script will silently skip any items that are not name items (and looks only at the *first* “instance of” statement),
+Note that this will not work if you are using a bot password that is limited to updating your user JS pages,
+as described above (unless you included the item IDs in the “allowed pages for editing”, of course).
+
+The script will silently skip any items that are not name items (and looks only at the *first* “instance of” statement),
 so depending on the current state of the sandbox items the above command may not do anything.
 (However, you can still use it to test if the configuration file is correct,
 since the script will attempt to login before looking at the items.)
