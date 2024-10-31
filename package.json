@@ -5,10 +5,9 @@
   "main": "namescript.js",
   "dependencies": {
     "line-by-line": "^0.1.6",
-    "mwbot": "^1.0.10",
-    "toml": "^2.3.3"
+    "mwbot": "^2.1.3",
+    "toml": "^3.0.0"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lucaswerkmeister/namescript.git"
