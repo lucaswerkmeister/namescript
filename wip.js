@@ -4888,7 +4888,9 @@ function prepareLabels(name, languageinfo, langlist, entity) {
 	}
 
 	for (const codeToRemove of codesToRemove) {
-		entity.labels[codeToRemove] = { language: codeToRemove, remove: '' };
+		if (codeToRemove in entity.labels) {
+			entity.labels[codeToRemove] = { language: codeToRemove, remove: '' };
+		}
 	}
 	for (const codeToSet of codesToSet) {
 		entity.labels[codeToSet] = { language: codeToSet, value: name };
