@@ -4903,7 +4903,7 @@ function prepareLabels(name, languageinfo, langlist, entity) {
 
 const entity = {
 	labels: {
-		en: { language: 'en', value: 'Lucas' },
+		en: { language: 'en', value: 'Lucas3' }, // TODO: this should *probably* cause all labels to be set, shouldn’t it. we should take this implicit fallback into account when looping through the explicit fallbacks
 		de: { language: 'de', value: 'Lucas' },
 	},
 };
