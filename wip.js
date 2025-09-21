@@ -4827,7 +4827,7 @@ function prepareLabels(name, languageinfo, langlist, entity) {
 	const codesToKeep = new Set();
 	const codesToSet = new Set(['mul']);
 
-	const maxFallbacks = Math.max(Object.values(languageinfo).map(({fallbacks}) => fallbacks.length));
+	const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length));
 
 	for (let i = 0; i < maxFallbacks * 2 && todoList.length > 0; i++) {
 		todos:
