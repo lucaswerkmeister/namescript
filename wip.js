@@ -4855,7 +4855,7 @@ function prepareLabels(name, languageinfo, langlist, entity) {
 					j--;
 					continue todos;
 				}
-				if (codesToKeep.has(fallbackCode) || codesToSet(fallbackCode)) {
+				if (codesToKeep.has(fallbackCode) || codesToSet.has(fallbackCode)) {
 					// this label is not going to fall back to mul, so set it to make sure no fallback indicator is shown
 					codesToSet.add(languageCode);
 					// remove from todoList
