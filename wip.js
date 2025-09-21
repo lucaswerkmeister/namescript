@@ -4833,7 +4833,8 @@ function prepareLabels(name, languageinfo, langlist, entity) {
 		todos:
 		for (let j = 0; j < todoList.length; j++) {
 			const languageCode = todoList[j];
-			if (entity.labels[languageCode]?.value !== name) {
+			const languageLabel = entity.labels[languageCode]?.value;
+			if (languageLabel && languageLabel !== name) {
 				// keep this label which is not the same as the name
 				codesToKeep.add(languageCode);
 				// remove from todoList
@@ -4844,7 +4845,8 @@ function prepareLabels(name, languageinfo, langlist, entity) {
 			}
 			fallbacks:
 			for (const fallbackCode of languageinfo[languageCode].fallbacks) {
-				if (entity.labels[fallbackCode]?.value !== name) {
+				const fallbackLabel = entity.labels[fallbackCode]?.value;
+				if (fallbackLabel && fallbackLabel !== name) {
 					// set this label to the name so it does not fall back to a different label
 					codesToSet.add(languageCode);
 					// remove from todoList
@@ -4866,7 +4868,7 @@ function prepareLabels(name, languageinfo, langlist, entity) {
 					// this fallback language will be irrelevant, continue
 					continue fallbacks;
 				}
-				if (entity.labels[fallbackCode]?.value === name) {
+				if (fallbackLabel === name) {
 					// we’ll have to see if this fallback will be kept or not, for now skip looking at this chain
 					continue todos;
 				}
