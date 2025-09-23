@@ -286,7 +286,8 @@ namescript = {
 		const codesToKeep = new Set();
 		const codesToSet = new Set(['mul']);
 
-		const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length));
+		// maximum length of fallback chains (plus one to account for implicit 'en' fallback)
+		const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length + 1));
 
 		for (let i = 0; i < maxFallbacks * 2 && todoList.length > 0; i++) {
 			todos:
@@ -303,7 +304,7 @@ namescript = {
 					continue;
 				}
 				fallbacks:
-				for (const fallbackCode of languageinfo[languageCode].fallbacks) {
+				for (const fallbackCode of [...languageinfo[languageCode].fallbacks, 'en']) {
 					const fallbackLabel = entity.labels[fallbackCode]?.value;
 					if (fallbackLabel && fallbackLabel !== name) {
 						// set this label to the name so it does not fall back to a different label
