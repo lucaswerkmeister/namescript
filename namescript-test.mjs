@@ -1,3 +1,7 @@
+import { expect } from 'chai';
+import './namescript-lib.js';
+const { prepareLabels } = namescript;
+
 const languageinfo = {
 	"aa": {
 	    "fallbacks": []
@@ -4558,354 +4562,72 @@ const languageinfo = {
 	}
 };
 
-const langlist = [
-	"aa",
-	"ace",
-	"aeb-latn",
-	"af",
-	"aln",
-	"an",
-	"ang",
-	"arn",
-	"ast",
-	"atj",
-	"avk",
-	"ay",
-	"ban",
-	"bar",
-	"bbc",
-	"bbc-latn",
-	"bcl",
-	"bi",
-	"bm",
-	"br",
-	"bs",
-	"bto",
-	"ca",
-	"cbk-zam",
-	"ceb",
-	"ch",
-	"cho",
-	"chy",
-	"co",
-	"cps",
-	"crh-latn",
-	"cs",
-	"csb",
-	"cy",
-	"da",
-	"dag",
-	"de",
-	"de-at",
-	"de-ch",
-	"din",
-	"dsb",
-	"dtp",
-	"ee",
-	"egl",
-	"eml",
-	"en",
-	"en-ca",
-	"en-gb",
-	"eo",
-	"es",
-	"et",
-	"eu",
-	"ext",
-	"ff",
-	"fi",
-	"fit",
-	"fj",
-	"fo",
-	"fr",
-	"frc",
-	"frp",
-	"frr",
-	"fur",
-	"fy",
-	"ga",
-	"gag",
-	"gd",
-	"gl",
-	"gn",
-	"gom-latn",
-	"gor",
-	"gsw",
-	"gv",
-	"ha",
-	"haw",
-	"hif",
-	"hif-latn",
-	"hil",
-	"ho",
-	"hr",
-	"hrx",
-	"hsb",
-	"ht",
-	"hu",
-	"hz",
-	"ia",
-	"id",
-	"ie",
-	"ig",
-	"ik",
-	"ike-latn",
-	"ilo",
-	"io",
-	"is",
-	"it",
-	"jam",
-	"jbo",
-	"jut",
-	"jv",
-	"kaa",
-	"kab",
-	"kbp",
-	"kea",
-	"kg",
-	"ki",
-	"kj",
-	"kk-latn",
-	"kk-tr",
-	"kl",
-	"kr",
-	"kri",
-	"krj",
-	"krl",
-	"ksh",
-	"ku-latn",
-	"kw",
-	"la",
-	"lad",
-	"lb",
-	"lfn",
-	"lg",
-	"li",
-	"lij",
-	"liv",
-	"lmo",
-	"ln",
-	"loz",
-	"lt",
-	"ltg",
-	"lus",
-	"lv",
-	"map-bms",
-	"mg",
-	"mh",
-	"mi",
-	"ms",
-	"mt",
-	"mus",
-	"mwl",
-	"na",
-	"nah",
-	"nap",
-	"nb",
-	"nds",
-	"nds-nl",
-	"ng",
-	"niu",
-	"nl",
-	"nn",
-	"nov",
-	"nrm",
-	"nso",
-	"nv",
-	"ny",
-	"nys",
-	"oc",
-	"olo",
-	"pag",
-	"pam",
-	"pap",
-	"pcd",
-	"pdc",
-	"pdt",
-	"pfl",
-	"pih",
-	"pl",
-	"pms",
-	"prg",
-	"pt",
-	"pt-br",
-	"qu",
-	"qug",
-	"rgn",
-	"rif",
-	"rm",
-	"rn",
-	"ro",
-	"roa-tara",
-	"rup",
-	"ruq-latn",
-	"rw",
-	"sc",
-	"scn",
-	"sco",
-	"sdc",
-	"se",
-	"sei",
-	"sg",
-	"sgs",
-	"shi-latn",
-	"sje",
-	"sk",
-	"sl",
-	"sli",
-	"sm",
-	"sma",
-	"smj",
-	"sn",
-	"so",
-	"sq",
-	"sr-el",
-	"srn",
-	"srq",
-	"ss",
-	"st",
-	"stq",
-	"su",
-	"sv",
-	"sw",
-	"szl",
-	"tet",
-	"tg-latn",
-	"tn",
-	"to",
-	"tpi",
-	"tr",
-	"ts",
-	"tt-latn",
-	"tum",
-	"tw",
-	"ty",
-	"ug-latn",
-	"ve",
-	"vec",
-	"vi",
-	"vls",
-	"vmf",
-	"vo",
-	"vro",
-	"wa",
-	"war",
-	"wo",
-	"xh",
-	"yo",
-	"zea",
-	"zu"
-];
+import namescriptData from './namescript-data.json' with { type: 'json' };
+const langlist = namescriptData.langlist.Q8229;
 
-function prepareLabels(name, languageinfo, langlist, entity) {
+describe('prepareLabels', () => {
 
-		// LABELS
-		// four sets of language codes:
-		// TODO: starts out as langlist
-		// to REMOVE: starts out empty
-		// to KEEP: starts out empty
-		// to SET: starts out {'mul'}
-		// while TODO is not empty:
-		//  for each language code L in TODO:
-		//   if L label ≠ name: add L to KEEP, remove from TODO, continue
-		//   for each language code FB in [L, ...fallbacks of L] (not including en or mul):
-		//    if FB label ≠ name: add L to SET, remove from TODO, continue 2
-		//    if FB in KEEP or SET: add L to SET, remove from TODO, continue 2
-		//    if FB in REMOVE: continue
-		//    if FB label = name: continue 2
-		//    if FB label unset: continue
-		//   add L to REMOVE, remove from TODO
-		// now that TODO is empty:
-		// KEEP has labels that should be kept (somebody, for whatever reason, set them to be different from name)
-		// SET has labels that should be set so that the name will be shown as the label in that language
-		// REMOVE has labels that should be removed so they will fall back
-		// FIXME: I think there might be an infinite loop in there, if the “FB label = name” case happens between two reciprocal fallback languages
-		// I think we can just add a limit to the loop, 10 iterations or so, and anything still in TODO after that can be in… REMOVE? (as no fallback chain is that long. actually, maybe just make the limit depend on the longest fallback chain to begin with.)
+	it('initializes empty labels with just mul', () => {
+		const entity = {
+			labels: {},
+		};
+		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(prepared).eql({
+			labels: {
+				mul: { language: 'mul', value: 'NAME' },
+			},
+		});
+	});
 
-	const todoList = [...langlist];
-	const codesToRemove = new Set();
-	const codesToKeep = new Set();
-	const codesToSet = new Set(['mul']);
+	it('remove existing labels that match the name', () => {
+		const entity = {
+			labels: {
+				en: { language: 'en', value: 'NAME' },
+				de: { language: 'de', value: 'NAME' },
+			},
+		};
+		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(prepared).eql({
+			labels: {
+				mul: { language: 'mul', value: 'NAME' },
+				en: { language: 'en', remove: '' },
+				de: { language: 'de', remove: '' },
+			},
+		});
+	});
 
-	const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length));
+	it('keeps mismatching labels but overrides them in languages that fall back to them', () => {
+		const entity = {
+			labels: {
+				pl: { language: 'pl', value: 'LABEL' },
+			},
+		};
+		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(prepared).eql({
+			labels: {
+				pl: { language: 'pl', value: 'LABEL' },
+				mul: { language: 'mul', value: 'NAME' },
+				csb: { language: 'csb', value: 'NAME' },
+				szl: { language: 'szl', value: 'NAME' },
+			},
+		});
+	});
 
-	for (let i = 0; i < maxFallbacks * 2 && todoList.length > 0; i++) {
-		todos:
-		for (let j = 0; j < todoList.length; j++) {
-			const languageCode = todoList[j];
-			const languageLabel = entity.labels[languageCode]?.value;
-			if (languageLabel && languageLabel !== name) {
-				// keep this label which is not the same as the name
-				codesToKeep.add(languageCode);
-				// remove from todoList
-				todoList.splice(j, 1);
-				// counteract j++ at the end of the loop because we removed an element
-				j--;
-				continue;
-			}
-			fallbacks:
-			for (const fallbackCode of languageinfo[languageCode].fallbacks) {
-				const fallbackLabel = entity.labels[fallbackCode]?.value;
-				if (fallbackLabel && fallbackLabel !== name) {
-					// set this label to the name so it does not fall back to a different label
-					codesToSet.add(languageCode);
-					// remove from todoList
-					todoList.splice(j, 1);
-					// counteract j++ at the end of the loop because we removed an element
-					j--;
-					continue todos;
-				}
-				if (codesToKeep.has(fallbackCode) || codesToSet.has(fallbackCode)) {
-					// this label is not going to fall back to mul, so set it to make sure no fallback indicator is shown
-					codesToSet.add(languageCode);
-					// remove from todoList
-					todoList.splice(j, 1);
-					// counteract j++ at the end of the loop because we removed an element
-					j--;
-					continue todos;
-				}
-				if (codesToRemove.has(fallbackCode)) {
-					// this fallback language will be irrelevant, continue
-					continue fallbacks;
-				}
-				if (fallbackLabel === name) {
-					// we’ll have to see if this fallback will be kept or not, for now skip looking at this chain
-					continue todos;
-				}
-			}
-			// this label will fall back all the way to mul, remove it
-			codesToRemove.add(languageCode);
-			// remove from todoList
-			todoList.splice(j, 1);
-			// counteract j++ at the end of the loop because we removed an element
-			j--;
-		}
-	}
+	it('overrides mismatching en labels in all languages', () => {
+		const entity = {
+			labels: {
+				en: { language: 'en', value: 'LABEL' },
+			},
+		};
+		const langlist = ['de', 'en'];
+		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(prepared).eql({
+			labels: {
+				en: { language: 'en', value: 'LABEL' },
+				mul: { language: 'mul', value: 'NAME' },
+				de: { language: 'de', value: 'NAME' },
+			},
+		});
+	});
 
-	for (const languageCode of todoList) {
-		// anything left in the TODO list must be a cycle between fallback languages that are all set to the name, so remove it
-		// FIXME: probably worth validating that assumption in the code, should be easy enough after all
-		// FIXME: actually, what if there’s a cycle, but when we take that out, *then* there’s another fallback language that has a different name?
-		codesToRemove.add(languageCode);
-	}
-
-	for (const codeToRemove of codesToRemove) {
-		if (codeToRemove in entity.labels) {
-			entity.labels[codeToRemove] = { language: codeToRemove, remove: '' };
-		}
-	}
-	for (const codeToSet of codesToSet) {
-		entity.labels[codeToSet] = { language: codeToSet, value: name };
-	}
-
-	return entity;
-}
-
-const entity = {
-	labels: {
-		en: { language: 'en', value: 'Lucas3' }, // TODO: this should *probably* cause all labels to be set, shouldn’t it. we should take this implicit fallback into account when looping through the explicit fallbacks
-		de: { language: 'de', value: 'Lucas' },
-	},
-};
-
-console.log(prepareLabels('Lucas', languageinfo, langlist, entity));
+});

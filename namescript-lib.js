@@ -279,6 +279,87 @@ namescript = {
 		}), entity.id, "adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
 	}
 
+	// this function is added to the namescript global for testing purposes
+	namescript.prepareLabels = function(name, languageinfo, langlist, entity) {
+		const todoList = [...langlist];
+		const codesToRemove = new Set();
+		const codesToKeep = new Set();
+		const codesToSet = new Set(['mul']);
+
+		const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length));
+
+		for (let i = 0; i < maxFallbacks * 2 && todoList.length > 0; i++) {
+			todos:
+			for (let j = 0; j < todoList.length; j++) {
+				const languageCode = todoList[j];
+				const languageLabel = entity.labels[languageCode]?.value;
+				if (languageLabel && languageLabel !== name) {
+					// keep this label which is not the same as the name
+					codesToKeep.add(languageCode);
+					// remove from todoList
+					todoList.splice(j, 1);
+					// counteract j++ at the end of the loop because we removed an element
+					j--;
+					continue;
+				}
+				fallbacks:
+				for (const fallbackCode of languageinfo[languageCode].fallbacks) {
+					const fallbackLabel = entity.labels[fallbackCode]?.value;
+					if (fallbackLabel && fallbackLabel !== name) {
+						// set this label to the name so it does not fall back to a different label
+						codesToSet.add(languageCode);
+						// remove from todoList
+						todoList.splice(j, 1);
+						// counteract j++ at the end of the loop because we removed an element
+						j--;
+						continue todos;
+					}
+					if (codesToKeep.has(fallbackCode) || codesToSet.has(fallbackCode)) {
+						// this label is not going to fall back to mul, so set it to make sure no fallback indicator is shown
+						codesToSet.add(languageCode);
+						// remove from todoList
+						todoList.splice(j, 1);
+						// counteract j++ at the end of the loop because we removed an element
+						j--;
+						continue todos;
+					}
+					if (codesToRemove.has(fallbackCode)) {
+						// this fallback language will be irrelevant, continue
+						continue fallbacks;
+					}
+					if (fallbackLabel === name) {
+						// we’ll have to see if this fallback will be kept or not, for now skip looking at this chain
+						continue todos;
+					}
+				}
+				// this label will fall back all the way to mul, remove it
+				codesToRemove.add(languageCode);
+				// remove from todoList
+				todoList.splice(j, 1);
+				// counteract j++ at the end of the loop because we removed an element
+				j--;
+			}
+		}
+
+		for (const languageCode of todoList) {
+			// anything left in the TODO list must be a cycle between fallback languages that are all set to the name, so remove it
+			// FIXME: probably worth validating that assumption in the code, should be easy enough after all
+			// FIXME: actually, what if there’s a cycle, but when we take that out, *then* there’s another fallback language that has a different name?
+			codesToRemove.add(languageCode);
+		}
+
+		for (const codeToRemove of codesToRemove) {
+			if (codeToRemove in entity.labels) {
+				entity.labels[codeToRemove] = { language: codeToRemove, remove: '' };
+			}
+		}
+		for (const codeToSet of codesToSet) {
+			entity.labels[codeToSet] = { language: codeToSet, value: name };
+		}
+
+		return entity;
+	}
+
 	/**
 	 * Edit an entity.
 	 * @param {object} item The entity data.
