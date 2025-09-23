@@ -4630,4 +4630,21 @@ describe('prepareLabels', () => {
 		});
 	});
 
+	it('handles cycle in fallback languages', () => {
+		const entity = {
+			labels: {
+				pt: { language: 'pt', value: 'NAME' },
+				'pt-br': { language: 'pt-br', value: 'NAME' },
+			},
+		};
+		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(prepared).eql({
+			labels: {
+				mul: { language: 'mul', value: 'NAME' },
+				pt: { language: 'pt', remove: '' },
+				'pt-br': { language: 'pt-br', remove: '' },
+			},
+		});
+	});
+
 });
