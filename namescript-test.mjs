@@ -4647,4 +4647,23 @@ describe('prepareLabels', () => {
 		});
 	});
 
+	it('handles cycle in fallback languages with fallback to other label', () => {
+		const entity = {
+			labels: {
+				dsb: { language: 'dsb', value: 'NAME' },
+				hsb: { language: 'hsb', value: 'NAME' },
+				de: { language: 'de', value: 'LABEL' },
+			},
+		};
+		const prepared = prepareLabels('NAME', languageinfo, ['dsb', 'hsb', 'de'], entity);
+		expect(prepared).eql({
+			labels: {
+				mul: { language: 'mul', value: 'NAME' },
+				dsb: { language: 'dsb', value: 'NAME' },
+				hsb: { language: 'hsb', value: 'NAME' },
+				de: { language: 'de', value: 'LABEL' },
+			},
+		});
+	});
+
 });
