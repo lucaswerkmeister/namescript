@@ -303,6 +303,7 @@ namescript = {
 					j--;
 					continue;
 				}
+				let knownToFallBackToMul = true;
 				fallbacks:
 				for (const fallbackCode of [...languageinfo[languageCode].fallbacks, 'en']) {
 					const fallbackLabel = entity.labels[fallbackCode]?.value;
@@ -329,23 +330,24 @@ namescript = {
 						continue fallbacks;
 					}
 					if (fallbackLabel === name) {
-						// we’ll have to see if this fallback will be kept or not, for now skip looking at this chain
-						continue todos;
+						// we’ll have to see if this fallback will be kept or not, possibly in the next iteration of the outermost loop
+						knownToFallBackToMul = false;
 					}
 				}
-				// this label will fall back all the way to mul, remove it
-				codesToRemove.add(languageCode);
-				// remove from todoList
-				todoList.splice(j, 1);
-				// counteract j++ at the end of the loop because we removed an element
-				j--;
+				if (knownToFallBackToMul) {
+					// this label will fall back all the way to mul, remove it
+					codesToRemove.add(languageCode);
+					// remove from todoList
+					todoList.splice(j, 1);
+					// counteract j++ at the end of the loop because we removed an element
+					j--;
+				}
 			}
 		}
 
 		for (const languageCode of todoList) {
 			// anything left in the TODO list must be a cycle between fallback languages that are all set to the name, so remove it
 			// FIXME: probably worth validating that assumption in the code, should be easy enough after all
-			// FIXME: actually, what if there’s a cycle, but when we take that out, *then* there’s another fallback language that has a different name?
 			codesToRemove.add(languageCode);
 		}
 
