@@ -306,6 +306,10 @@ namescript = {
 				let knownToFallBackToMul = true;
 				fallbacks:
 				for (const fallbackCode of [...languageinfo[languageCode].fallbacks, 'en']) {
+					if (fallbackCode === languageCode) {
+						// not an actual fallback (probably caused by the insertion of 'en' above)
+						continue fallbacks;
+					}
 					const fallbackLabel = entity.labels[fallbackCode]?.value;
 					if (fallbackLabel && fallbackLabel !== name) {
 						// set this label to the name so it does not fall back to a different label
@@ -346,8 +350,22 @@ namescript = {
 		}
 
 		for (const languageCode of todoList) {
-			// anything left in the TODO list must be a cycle between fallback languages that are all set to the name, so remove it
-			// FIXME: probably worth validating that assumption in the code, should be easy enough after all
+			// anything left in the TODO list must be a cycle between fallback languages that are all set to the name
+			for (const fallbackCode of [languageCode, ...languageinfo[languageCode].fallbacks, 'en']) {
+				const fallbackLabel = entity.labels[fallbackCode]?.value;
+				if (!codesToRemove.has(fallbackCode) && !todoList.includes(fallbackCode)) {
+					throw new Error(
+						'Namescript error: fallback language ' + fallbackCode + ' of language ' + languageCode +
+							' is not going to be removed but has no clear reason to be kept either'
+					);
+				}
+				if (fallbackLabel && fallbackLabel !== name) {
+					throw new Error(
+						'Namescript error: fallback language ' + fallbackCode + ' of language ' + languageCode +
+							' is not going to be removed but has a different label'
+					);
+				}
+			}
 			codesToRemove.add(languageCode);
 		}
 
