@@ -188,14 +188,10 @@ namescript = {
 	 * @param {desctype} desctype One of "surname", "male given name", "female given name", "unisex given name"
 	 */
 	async function prepareStuff(entity, name, nameInKana, desctype, script) {
-		var countlabels = 0;
-		var countdescs = 0;
-		var countaliases = 0;
 		var jsonLabel = [];
 		var jsonDesc = [];
 		var jsonAliases = [];
 		var existingdescs = entity["descriptions"];
-		var newdesclist = {};
 
 		const languageinfo = (await namescript.config.apiRequest({
 			action: 'query',
@@ -203,57 +199,25 @@ namescript = {
 			liprop: 'fallbacks',
 		})).query.languageinfo;
 
-		// LABELS
-		// four sets of language codes:
-		// TODO: starts out as langlist
-		// to REMOVE: starts out empty
-		// to KEEP: starts out empty
-		// to SET: starts out {'mul'}
-		// while TODO is not empty:
-		//  for each language code L in TODO:
-		//   if L label ≠ name: add L to KEEP, remove from TODO, continue
-		//   for each language code FB in [L, ...fallbacks of L] (not including en or mul):
-		//    if FB label ≠ name: add L to SET, remove from TODO, continue 2
-		//    if FB in KEEP or SET: add L to SET, remove from TODO, continue 2
-		//    if FB in REMOVE: continue
-		//    if FB label = name: continue 2
-		//    if FB label unset: continue
-		//   add L to REMOVE, remove from TODO
-		// now that TODO is empty:
-		// KEEP has labels that should be kept (somebody, for whatever reason, set them to be different from name)
-		// SET has labels that should be set so that the name will be shown as the label in that language
-		// REMOVE has labels that should be removed so they will fall back
-		// FIXME: I think there might be an infinite loop in there, if the “FB label = name” case happens between two reciprocal fallback languages
-		// I think we can just add a limit to the loop, 10 iterations or so, and anything still in TODO after that can be in… REMOVE? (as no fallback chain is that long. actually, maybe just make the limit depend on the longest fallback chain to begin with.)
-		
-		var existinglabels = entity["labels"];
-		var newlanglist = [];
-		for (var i = 0; i < namescript.data.langlist[script].length; i++) {
-			if (!existinglabels[namescript.data.langlist[script][i]]) {
-				newlanglist.push(namescript.data.langlist[script][i]);
-			}
+		const { codesToSet, codesToRemove } = namescript.prepareLabels(name, languageinfo, namescript.data.langlist[script], entity);
+
+		for (const codeToRemove of codesToRemove) {
+			jsonLabel.push({language: codeToRemove, remove: ''});
 		}
-		
-		if (newlanglist.length === 0) {
+		for (const codeToSet of codesToSet) {
+			jsonLabel.push({language: codeToSet, value: name});
+		}
+		if (jsonLabel.length === 0) {
 			namescript.config.infoActive(translate('all-set'));
-		} else {
-			for (var j = 0; j < newlanglist.length; j++) {
-				countlabels++;
-				jsonLabel.push({
-					language: newlanglist[j],
-					value: name
-				});
-			}
 		}
+
 		for (var j = 0; j < namescript.data.aliaslanglist[script].length; j++) {
-			countaliases++;
 			jsonAliases.push( [{
 				language: namescript.data.aliaslanglist[script][j],
 				value: name,
 				add: ""
 			}] );
 			if (nameInKana && script === 'Q82772') {
-				countaliases++;
 				jsonAliases.push( [{
 					language: namescript.data.aliaslanglist[script][j],
 					value: nameInKana,
@@ -264,7 +228,6 @@ namescript = {
 
 		for (const lang in namescript.data.descriptions[desctype][script]) {
 			if (!existingdescs[lang]) {
-				countdescs++;
 				jsonDesc.push({
 					language: lang,
 					value: getDescription(lang, name, nameInKana, desctype, script)
@@ -272,11 +235,36 @@ namescript = {
 			}
 		}
 
+		let summary = '';
+		if (codesToSet.length > 0) {
+			summary += 'adding ' + codesToSet.length + ' labels';
+		}
+		if (codesToRemove.length > 0) {
+			if (summary.length > 0) {
+				summary += ', ';
+			}
+			summary += 'removing ' + codesToRemove.length + ' labels';
+		}
+		if (jsonDesc.length > 0) {
+			if (summary.length > 0) {
+				summary += ', ';
+			}
+			summary += 'adding ' + jsonDesc.length + ' descriptions';
+		}
+		if (jsonAliases.length > 0) {
+			if (summary.length > 0) {
+				summary += ', ';
+			}
+			summary += 'updating aliases';
+		}
+		summary += ' for ' + desctype;
+		summary = summary.replace(/, (?=[^,]*$)/, ' and '); // replace last ', ' with ' and '
+
 		await setItem(JSON.stringify({
 			'descriptions': jsonDesc,
 			'labels': jsonLabel,
 			'aliases': jsonAliases
-		}), entity.id, "adding " + countlabels + " labels, " + countdescs + " descriptions and updating aliases for " + desctype);
+		}), entity.id, summary);
 	}
 
 	// this function is added to the namescript global for testing purposes
