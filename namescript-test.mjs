@@ -4571,12 +4571,10 @@ describe('prepareLabels', () => {
 		const entity = {
 			labels: {},
 		};
-		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
-		expect(prepared).eql({
-			labels: {
-				mul: { language: 'mul', value: 'NAME' },
-			},
-		});
+		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(codesToSet).eql(new Set(['mul']));
+		expect(codesToRemove).to.be.empty;
+		expect(codesToKeep).to.be.empty;
 	});
 
 	it('remove existing labels that match the name', () => {
@@ -4586,14 +4584,10 @@ describe('prepareLabels', () => {
 				de: { language: 'de', value: 'NAME' },
 			},
 		};
-		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
-		expect(prepared).eql({
-			labels: {
-				mul: { language: 'mul', value: 'NAME' },
-				en: { language: 'en', remove: '' },
-				de: { language: 'de', remove: '' },
-			},
-		});
+		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(codesToSet).to.eql(new Set(['mul']));
+		expect(codesToRemove).to.eql(new Set(['en', 'de']));
+		expect(codesToKeep).to.be.empty;
 	});
 
 	it('keeps mismatching labels but overrides them in languages that fall back to them', () => {
@@ -4602,15 +4596,10 @@ describe('prepareLabels', () => {
 				pl: { language: 'pl', value: 'LABEL' },
 			},
 		};
-		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
-		expect(prepared).eql({
-			labels: {
-				pl: { language: 'pl', value: 'LABEL' },
-				mul: { language: 'mul', value: 'NAME' },
-				csb: { language: 'csb', value: 'NAME' },
-				szl: { language: 'szl', value: 'NAME' },
-			},
-		});
+		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(codesToSet).to.eql(new Set(['mul', 'csb', 'szl']));
+		expect(codesToRemove).to.be.empty;
+		expect(codesToKeep).to.eql(new Set(['pl']));
 	});
 
 	it('overrides mismatching en labels in all languages', () => {
@@ -4620,14 +4609,10 @@ describe('prepareLabels', () => {
 			},
 		};
 		const langlist = ['de', 'en'];
-		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
-		expect(prepared).eql({
-			labels: {
-				en: { language: 'en', value: 'LABEL' },
-				mul: { language: 'mul', value: 'NAME' },
-				de: { language: 'de', value: 'NAME' },
-			},
-		});
+		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(codesToSet).to.eql(new Set(['mul', 'de']));
+		expect(codesToRemove).to.be.empty;
+		expect(codesToKeep).to.eql(new Set(['en']));
 	});
 
 	it('handles cycle in fallback languages', () => {
@@ -4637,14 +4622,10 @@ describe('prepareLabels', () => {
 				'pt-br': { language: 'pt-br', value: 'NAME' },
 			},
 		};
-		const prepared = prepareLabels('NAME', languageinfo, langlist, entity);
-		expect(prepared).eql({
-			labels: {
-				mul: { language: 'mul', value: 'NAME' },
-				pt: { language: 'pt', remove: '' },
-				'pt-br': { language: 'pt-br', remove: '' },
-			},
-		});
+		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(codesToSet).to.eql(new Set(['mul']));
+		expect(codesToRemove).to.eql(new Set(['pt', 'pt-br']));
+		expect(codesToKeep).to.be.empty;
 	});
 
 	it('handles cycle in fallback languages with fallback to other label', () => {
@@ -4655,15 +4636,11 @@ describe('prepareLabels', () => {
 				de: { language: 'de', value: 'LABEL' },
 			},
 		};
-		const prepared = prepareLabels('NAME', languageinfo, ['dsb', 'hsb', 'de'], entity);
-		expect(prepared).eql({
-			labels: {
-				mul: { language: 'mul', value: 'NAME' },
-				dsb: { language: 'dsb', value: 'NAME' },
-				hsb: { language: 'hsb', value: 'NAME' },
-				de: { language: 'de', value: 'LABEL' },
-			},
-		});
+		const langlist = ['dsb', 'hsb', 'de'];
+		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(codesToSet).to.eql(new Set(['mul', 'dsb', 'hsb']));
+		expect(codesToRemove).to.be.empty;
+		expect(codesToKeep).to.eql(new Set(['de']));
 	});
 
 });

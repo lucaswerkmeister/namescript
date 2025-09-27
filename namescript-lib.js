@@ -282,9 +282,9 @@ namescript = {
 	// this function is added to the namescript global for testing purposes
 	namescript.prepareLabels = function(name, languageinfo, langlist, entity) {
 		const todoList = [...langlist];
+		const codesToSet = new Set(['mul']);
 		const codesToRemove = new Set();
 		const codesToKeep = new Set();
-		const codesToSet = new Set(['mul']);
 
 		// maximum length of fallback chains (plus one to account for implicit 'en' fallback)
 		const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length + 1));
@@ -370,15 +370,12 @@ namescript = {
 		}
 
 		for (const codeToRemove of codesToRemove) {
-			if (codeToRemove in entity.labels) {
-				entity.labels[codeToRemove] = { language: codeToRemove, remove: '' };
+			if (!(codeToRemove in entity.labels)) {
+				codesToRemove.delete(codeToRemove);
 			}
 		}
-		for (const codeToSet of codesToSet) {
-			entity.labels[codeToSet] = { language: codeToSet, value: name };
-		}
 
-		return entity;
+		return { codesToSet, codesToRemove, codesToKeep };
 	}
 
 	/**
