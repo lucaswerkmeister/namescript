@@ -236,14 +236,14 @@ namescript = {
 		}
 
 		let summary = '';
-		if (codesToSet.length > 0) {
-			summary += 'adding ' + codesToSet.length + ' labels';
+		if (codesToSet.size > 0) {
+			summary += 'adding ' + codesToSet.size + ' labels';
 		}
-		if (codesToRemove.length > 0) {
+		if (codesToRemove.size > 0) {
 			if (summary.length > 0) {
 				summary += ', ';
 			}
-			summary += 'removing ' + codesToRemove.length + ' labels';
+			summary += 'removing ' + codesToRemove.size + ' labels';
 		}
 		if (jsonDesc.length > 0) {
 			if (summary.length > 0) {
