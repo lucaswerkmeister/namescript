@@ -31,7 +31,11 @@ $.when(
 				text: namescript.translate('add-button'),
 				click: function() {
 					return add().catch(function(result) {
-						namescript.config.errorActive(result.error.info);
+						let message = result;
+						if (typeof result?.error?.info === 'string') {
+							message = result.error.info;
+						}
+						namescript.config.errorActive(message);
 					});
 				}
 			}));
