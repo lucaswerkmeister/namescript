@@ -4643,4 +4643,18 @@ describe('prepareLabels', () => {
 		expect(codesToKeep).to.eql(new Set(['de']));
 	});
 
+	it('handles cycle in fallback languages with fallback to language not in langlist', () => {
+		const entity = {
+			labels: {
+				nb: { language: 'nb', value: 'NAME' },
+				nn: { language: 'nn', value: 'NAME' },
+				// both fall back to 'no', which is not in the langlist
+			},
+		};
+		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(codesToSet).to.eql(new Set(['mul']));
+		expect(codesToRemove).to.eql(new Set(['nb']));
+		expect(codesToKeep).to.be.empty;
+	});
+
 });
