@@ -269,6 +269,7 @@ namescript = {
 
 	// this function is added to the namescript global for testing purposes
 	namescript.prepareLabels = function(name, languageinfo, langlist, entity) {
+		const langlistSet = new Set(langlist); // for faster membership checks
 		const workList = [...langlist];
 		const codesToSet = new Set(['mul']);
 		const codesToRemove = new Set();
@@ -308,7 +309,7 @@ namescript = {
 						j--;
 						continue work;
 					}
-					if (!fallbackLabel && !langlist.includes(fallbackCode)) {
+					if (!fallbackLabel && !langlistSet.has(fallbackCode)) {
 						// no need to consider this fallback code at all, continue
 						continue fallbacks;
 					}
@@ -345,7 +346,7 @@ namescript = {
 			// anything left in the work list must be a cycle between fallback languages that are all set to the name
 			for (const fallbackCode of [languageCode, ...languageinfo[languageCode].fallbacks, 'en']) {
 				const fallbackLabel = entity.labels[fallbackCode]?.value;
-				if (!fallbackLabel && !langlist.includes(fallbackCode)) {
+				if (!fallbackLabel && !langlistSet.has(fallbackCode)) {
 					// no need to consider this fallback code at all
 					continue;
 				}
