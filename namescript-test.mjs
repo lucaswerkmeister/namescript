@@ -4653,7 +4653,7 @@ describe('prepareLabels', () => {
 		};
 		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
 		expect(codesToSet).to.eql(new Set(['mul']));
-		expect(codesToRemove).to.eql(new Set(['nb']));
+		expect(codesToRemove).to.eql(new Set(['nb', 'nn']));
 		expect(codesToKeep).to.be.empty;
 	});
 

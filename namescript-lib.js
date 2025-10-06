@@ -308,6 +308,10 @@ namescript = {
 						j--;
 						continue todos;
 					}
+					if (!fallbackLabel && !langlist.includes(fallbackCode)) {
+						// no need to consider this fallback code at all, continue
+						continue fallbacks;
+					}
 					if (codesToKeep.has(fallbackCode) || codesToSet.has(fallbackCode)) {
 						// this label is not going to fall back to mul, so set it to make sure no fallback indicator is shown
 						codesToSet.add(languageCode);
@@ -341,6 +345,10 @@ namescript = {
 			// anything left in the TODO list must be a cycle between fallback languages that are all set to the name
 			for (const fallbackCode of [languageCode, ...languageinfo[languageCode].fallbacks, 'en']) {
 				const fallbackLabel = entity.labels[fallbackCode]?.value;
+				if (!fallbackLabel && !langlist.includes(fallbackCode)) {
+					// no need to consider this fallback code at all
+					continue;
+				}
 				if (!codesToRemove.has(fallbackCode) && !todoList.includes(fallbackCode)) {
 					throw new Error(
 						'Namescript error: fallback language ' + fallbackCode + ' of language ' + languageCode +
