@@ -269,7 +269,7 @@ namescript = {
 
 	// this function is added to the namescript global for testing purposes
 	namescript.prepareLabels = function(name, languageinfo, langlist, entity) {
-		const todoList = [...langlist];
+		const workList = [...langlist];
 		const codesToSet = new Set(['mul']);
 		const codesToRemove = new Set();
 		const codesToKeep = new Set();
@@ -277,16 +277,16 @@ namescript = {
 		// maximum length of fallback chains (plus one to account for implicit 'en' fallback)
 		const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length + 1));
 
-		for (let i = 0; i < maxFallbacks * 2 && todoList.length > 0; i++) {
-			todos:
-			for (let j = 0; j < todoList.length; j++) {
-				const languageCode = todoList[j];
+		for (let i = 0; i < maxFallbacks * 2 && workList.length > 0; i++) {
+			work:
+			for (let j = 0; j < workList.length; j++) {
+				const languageCode = workList[j];
 				const languageLabel = entity.labels[languageCode]?.value;
 				if (languageLabel && languageLabel !== name) {
 					// keep this label which is not the same as the name
 					codesToKeep.add(languageCode);
-					// remove from todoList
-					todoList.splice(j, 1);
+					// remove from workList
+					workList.splice(j, 1);
 					// counteract j++ at the end of the loop because we removed an element
 					j--;
 					continue;
@@ -302,11 +302,11 @@ namescript = {
 					if (fallbackLabel && fallbackLabel !== name) {
 						// set this label to the name so it does not fall back to a different label
 						codesToSet.add(languageCode);
-						// remove from todoList
-						todoList.splice(j, 1);
+						// remove from workList
+						workList.splice(j, 1);
 						// counteract j++ at the end of the loop because we removed an element
 						j--;
-						continue todos;
+						continue work;
 					}
 					if (!fallbackLabel && !langlist.includes(fallbackCode)) {
 						// no need to consider this fallback code at all, continue
@@ -315,11 +315,11 @@ namescript = {
 					if (codesToKeep.has(fallbackCode) || codesToSet.has(fallbackCode)) {
 						// this label is not going to fall back to mul, so set it to make sure no fallback indicator is shown
 						codesToSet.add(languageCode);
-						// remove from todoList
-						todoList.splice(j, 1);
+						// remove from workList
+						workList.splice(j, 1);
 						// counteract j++ at the end of the loop because we removed an element
 						j--;
-						continue todos;
+						continue work;
 					}
 					if (codesToRemove.has(fallbackCode)) {
 						// this fallback language will be irrelevant, continue
@@ -333,23 +333,23 @@ namescript = {
 				if (knownToFallBackToMul) {
 					// this label will fall back all the way to mul, remove it
 					codesToRemove.add(languageCode);
-					// remove from todoList
-					todoList.splice(j, 1);
+					// remove from workList
+					workList.splice(j, 1);
 					// counteract j++ at the end of the loop because we removed an element
 					j--;
 				}
 			}
 		}
 
-		for (const languageCode of todoList) {
-			// anything left in the TODO list must be a cycle between fallback languages that are all set to the name
+		for (const languageCode of workList) {
+			// anything left in the work list must be a cycle between fallback languages that are all set to the name
 			for (const fallbackCode of [languageCode, ...languageinfo[languageCode].fallbacks, 'en']) {
 				const fallbackLabel = entity.labels[fallbackCode]?.value;
 				if (!fallbackLabel && !langlist.includes(fallbackCode)) {
 					// no need to consider this fallback code at all
 					continue;
 				}
-				if (!codesToRemove.has(fallbackCode) && !todoList.includes(fallbackCode)) {
+				if (!codesToRemove.has(fallbackCode) && !workList.includes(fallbackCode)) {
 					throw new Error(
 						'Namescript error: fallback language ' + fallbackCode + ' of language ' + languageCode +
 							' is not going to be removed but has no clear reason to be kept either'
