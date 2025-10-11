@@ -9,7 +9,8 @@
             "no-P1814": "No P1814 property set! Set one and refresh the page.",
             "all-set": "All labels and descriptions have already been set.",
             "unknown-P31": "Unknown P31 value! (Keep in mind only the first statement is used.)",
-            "missing-P31": "Missing P31 statement!"
+            "missing-P31": "Missing P31 statement!",
+            "P1705-differs-mul": "P1705 value is different from mul label! Carefully check what the correct name string should be and make them match."
         },
         "fr": {
             "title": "Name script",

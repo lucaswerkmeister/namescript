@@ -92,6 +92,11 @@ namescript = {
 				if (claims["P1705"]) {
 					const name = claims["P1705"][0]["mainsnak"]["datavalue"]["value"]["text"];
 
+					if ("mul" in (entity["labels"] || {}) && entity["labels"]["mul"]["value"] !== name) {
+						namescript.config.errorP31(translate('P1705-differs-mul'));
+						return;
+					}
+
 					if (claims["P282"]) {
 						const script = claims["P282"][0]["mainsnak"]["datavalue"]["value"]["id"];
 
@@ -271,7 +276,7 @@ namescript = {
 	namescript.prepareLabels = function(name, languageinfo, langlist, entity) {
 		const langlistSet = new Set(langlist); // for faster membership checks
 		const workList = [...langlist];
-		const codesToSet = new Set(['mul']);
+		const codesToSet = new Set(['mul']); // inserteditlinks() already checks that mul label (if present) matches name
 		const codesToRemove = new Set();
 		const codesToKeep = new Set();
 
