@@ -95,7 +95,10 @@
             "no-P282": "Keine P282 Eigenschaft vorhanden! Setze eine und lade die Seite neu.",
             "unknown-P282": "Das Skript wird noch nicht unterstützt!",
             "no-P1814": "Keine P1814 Eigenschaft vorhanden! Setze eine und lade die Seite neu.",
-            "all-set": "Alle Bezeichnungen und Eigenschaften sind schon eingetragen."
+            "all-set": "Alle Bezeichnungen und Eigenschaften sind schon eingetragen.",
+            "unknown-P31": "Unbekannter P31-Wert! (Denk daran, dass nur die erste Aussage verwendet wird.)",
+            "missing-P31": "Fehlende P31-Aussage!",
+            "P1705-differs-mul": "P1705-Wert stimmt nicht mit der mul-Beschriftung überein! Prüfe sorgfältig, was die korrekte Zeichenkette des Namens sein sollte, und bringe beide Stellen in Übereinstimmung."
         },
         "sv": {
             "title": "Namnskript",
