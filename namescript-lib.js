@@ -285,6 +285,10 @@ namescript = {
 		if (!('mul' in entity.labels)) {
 			codesToSet.add('mul');
 		}
+		const mulIndex = workList.indexOf('mul');
+		if (mulIndex !== -1) {
+			workList.splice(mulIndex, 1); // remove 'mul' from workList
+		}
 
 		// maximum length of fallback chains (plus one to account for implicit 'en' fallback)
 		const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length + 1));
