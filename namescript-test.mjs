@@ -4615,6 +4615,18 @@ describe('prepareLabels', () => {
 		expect(codesToKeep).to.eql(new Set(['en']));
 	});
 
+	it('does nothing if item has only (matching) mul label', () => {
+		const entity = {
+			labels: {
+				mul: { language: 'mul', value: 'NAME' },
+			},
+		};
+		const { codesToSet, codesToRemove, codesToKeep } = prepareLabels('NAME', languageinfo, langlist, entity);
+		expect(codesToSet).to.be.empty;
+		expect(codesToRemove).to.be.empty;
+		expect(codesToKeep).to.be.empty;
+	});
+
 	it('handles cycle in fallback languages', () => {
 		const entity = {
 			labels: {

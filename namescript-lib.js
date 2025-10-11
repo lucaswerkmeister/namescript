@@ -276,9 +276,15 @@ namescript = {
 	namescript.prepareLabels = function(name, languageinfo, langlist, entity) {
 		const langlistSet = new Set(langlist); // for faster membership checks
 		const workList = [...langlist];
-		const codesToSet = new Set(['mul']); // inserteditlinks() already checks that mul label (if present) matches name
+		const codesToSet = new Set();
 		const codesToRemove = new Set();
 		const codesToKeep = new Set();
+
+		// mul is a special case: inserteditlinks() already checks that the mul label (if present) matches the name,
+		// so we only have to check if we need to set it or not
+		if (!('mul' in entity.labels)) {
+			codesToSet.add('mul');
+		}
 
 		// maximum length of fallback chains (plus one to account for implicit 'en' fallback)
 		const maxFallbacks = Math.max(...Object.values(languageinfo).map(({fallbacks}) => fallbacks.length + 1));
